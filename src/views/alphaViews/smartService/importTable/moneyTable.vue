@@ -1,0 +1,177 @@
+<template>
+  <div class="app-container">
+    <el-table
+      :data="salaryData"
+      stripe
+      style="width: 100%;margin-top: 10px">
+      <el-table-column
+        prop="name"
+        label="教师姓名">
+      </el-table-column>
+      <el-table-column
+        prop="basic"
+        label="岗位工资">
+      </el-table-column>
+      <el-table-column
+        prop="xinji"
+        label="薪级工资">
+      </el-table-column>
+      <el-table-column
+        prop="jixiao"
+        label="绩效基本">
+      </el-table-column>
+      <el-table-column
+        prop="reward"
+        label="奖励绩效">
+      </el-table-column>
+      <el-table-column
+        prop="personnel"
+        label="人才津贴">
+      </el-table-column>
+      <el-table-column
+        prop="traffic"
+        label="交通补助">
+      </el-table-column>
+      <el-table-column
+        prop="life"
+        label="生活补助">
+      </el-table-column>
+      <el-table-column
+        prop="price"
+        label="物价补贴">
+      </el-table-column>
+      <el-table-column
+        prop="sum"
+        label="应发合计">
+      </el-table-column>
+    </el-table>
+    <div class="fenye">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage4"
+        :page-sizes="[5, 10, 15, 20]"
+        :page-size="5"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="2">
+      </el-pagination>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "moneyTable",
+  data(){
+    return{
+      salaryData: [{
+        name:'王明',
+        basic:'2900',
+        xinji:'2000',
+        jixiao:'2100',
+        reward:'500',
+        personnel:'300',
+        traffic:'100',
+        life:'100',
+        price:'50',
+        sum:'8050'
+      },
+        {
+          name:'李强',
+          basic:'3300',
+          xinji:'1000',
+          jixiao:'1100',
+          reward:'700',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'80',
+          sum:'9911'
+        },{
+          name:'孙尚未',
+          basic:'3900',
+          xinji:'1000',
+          jixiao:'1100',
+          reward:'900',
+          personnel:'400',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'9231'
+        },{
+          name:'程咬金',
+          basic:'2900',
+          xinji:'3000',
+          jixiao:'2100',
+          reward:'500',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'9146'
+        },{
+          name:'少永恒',
+          basic:'2900',
+          xinji:'2000',
+          jixiao:'2100',
+          reward:'500',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'7922'
+        },{
+          name:'郭界',
+          basic:'2900',
+          xinji:'2000',
+          jixiao:'2100',
+          reward:'500',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'8732'
+        },{
+          name:'李明明',
+          basic:'2900',
+          xinji:'2000',
+          jixiao:'2100',
+          reward:'500',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'8320'
+        },{
+          name:'王宁',
+          basic:'2900',
+          xinji:'2000',
+          jixiao:'2100',
+          reward:'500',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'8053'
+        },{
+          name:'刘洋',
+          basic:'2900',
+          xinji:'2000',
+          jixiao:'2100',
+          reward:'500',
+          personnel:'300',
+          traffic:'100',
+          life:'100',
+          price:'50',
+          sum:'8250'
+        }],
+    }
+  }
+}
+</script>
+<style scoped>
+.fenye{
+  margin-top: 20px;
+  text-align: center;
+}
+</style>

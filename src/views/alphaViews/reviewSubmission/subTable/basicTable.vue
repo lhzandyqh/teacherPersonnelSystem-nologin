@@ -1,0 +1,98 @@
+<template>
+  <div class="app-container">
+    <el-table :data="peopleData" style="width: 100%">
+      <el-table-column prop="subdate" label="提交日期" />
+      <el-table-column prop="applypeople" label="提交人" />
+      <el-table-column prop="department" label="部门" />
+      <el-table-column prop="sub" label="提交内容" />
+      <el-table-column prop="name" label="审核类型" />
+      <el-table-column label="审核状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.approval==='通过'" type="success">审核通过</el-tag>
+          <el-tag v-if="scope.row.approval==='未通过'" type="danger">审核未通过</el-tag>
+          <el-tag v-if="scope.row.approval==='待通过'">审核待通过</el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div style="text-align: center; margin-top: 10px;">
+      <el-pagination
+        :current-page="currentPage"
+        :page-size="pagesize"
+        :page-sizes="[5, 10]"
+        :total="peopleData.length"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="handleCurrentChange"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+name: "basicTable",
+  data() {
+    return {
+      currentPage: 1,
+      pagesize: 5,
+      AuditingReason: '',
+      peopleData: [
+        {
+          subdate: '2020-06-21',
+          applypeople: '王老师',
+          department: '临床医学系',
+          sub: '基本信息',
+          name: '个人信息修改',
+          approval: '待通过',
+        }, {
+          subdate: '2020-08-21',
+          applypeople: '王老师',
+          department: '临床医学系',
+          sub: '专业能力',
+          name: '个人信息修改',
+          approval: '通过',
+        }, {
+          subdate: '2020-06-21',
+          applypeople: '王老师',
+          department: '临床医学系',
+          sub: '工作经历',
+          name: '个人信息修改',
+          approval: '通过',
+        }, {
+          subdate: '2020-06-21',
+          applypeople: '王老师',
+          department: '临床医学系',
+          sub: '基本信息',
+          name: '基本信息修改',
+          approval: '未通过',
+        },
+
+      ]
+    }
+  },
+  methods: {
+    jibenview(sub) {
+      if (sub === '基本信息') {
+        this.jibenVisible = true
+      } else if (sub === '专业能力') {
+        this.zhuanyeVisible = true
+      } else if (sub === '工作经历') {
+        this.workVisible = true
+      }
+    },
+    pass() {
+      this.$message({
+          type: 'success',
+          message: '审核成功'
+        }
+      )
+    }
+  }
+}
+</script>
+
+<style scoped>
+.foot{
+  text-align: center;
+  margin-top: 20px;
+}
+</style>
