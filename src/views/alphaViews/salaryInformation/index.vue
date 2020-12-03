@@ -20,98 +20,122 @@
       stripe
       style="width: 100%;margin-top: 10px">
       <el-table-column
-        prop="name"
-        label="教师姓名">
-      </el-table-column>
-      <el-table-column
         prop="basic"
-        label="岗位工资">
+        label="基础工资">
       </el-table-column>
       <el-table-column
         prop="xinji"
-        label="薪级工资">
+        label="其他津贴">
       </el-table-column>
       <el-table-column
         prop="jixiao"
-        label="绩效基本">
+        label="岗位津贴">
       </el-table-column>
       <el-table-column
         prop="reward"
-        label="奖励绩效">
+        label="学位津贴">
       </el-table-column>
       <el-table-column
         prop="personnel"
-        label="人才津贴">
+        label="午餐补助">
       </el-table-column>
       <el-table-column
         prop="traffic"
-        label="交通补助">
-      </el-table-column>
-      <el-table-column
-        prop="life"
-        label="生活补助">
-      </el-table-column>
-      <el-table-column
-        prop="price"
-        label="物价补贴">
+        label="校龄津贴">
       </el-table-column>
       <el-table-column
         prop="sum"
         label="应发合计">
       </el-table-column>
     </el-table>
+      <div style="font-size: 16px;font-weight: bolder;text-align: center;margin-top: 30px">
+        <span style="">特殊津贴部分</span>
+        <!--      <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addClass">新增</el-button></div>-->
+      </div>
+      <el-table
+        :data="daiData"
+        stripe
+        style="width: 100%;margin-top: 10px">
+        <el-table-column
+          prop="pension"
+          label="话费补助">
+        </el-table-column>
+        <el-table-column
+          prop="accumulation"
+          label="值班费">
+        </el-table-column>
+        <el-table-column
+          prop="medical"
+          label="安全奖">
+        </el-table-column>
+        <el-table-column
+          prop="gonghui"
+          label="公里补">
+        </el-table-column>
+        <el-table-column
+          prop="nowork"
+          label="教研室主任补贴">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="思政岗位绩效津贴">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="系部主任津贴">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="辅导员岗位津贴">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="特殊津贴">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="保险津贴">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="思政岗位绩效津贴">
+        </el-table-column>
+      </el-table>
     <div style="font-size: 16px;font-weight: bolder;text-align: center;margin-top: 30px">
       <span style="">代扣、代缴部分</span>
       <!--      <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addClass">新增</el-button></div>-->
     </div>
-    <el-table
-      :data="daiData"
-      stripe
-      style="width: 100%;margin-top: 10px">
-      <el-table-column
-        prop="name"
-        label="教师姓名">
-      </el-table-column>
-      <el-table-column
-        prop="pension"
-        label="养老金">
-      </el-table-column>
-      <el-table-column
-        prop="accumulation"
-        label="公积金">
-      </el-table-column>
-      <el-table-column
-        prop="medical"
-        label="医疗金">
-      </el-table-column>
-      <el-table-column
-        prop="gonghui"
-        label="工会费">
-      </el-table-column>
-      <el-table-column
-        prop="nowork"
-        label="失业金">
-      </el-table-column>
-      <el-table-column
-        prop="teacher"
-        label="教师公寓">
-      </el-table-column>
-      <el-table-column
-        prop="person"
-        label="个人所得税">
-      </el-table-column>
-      <el-table-column
-        prop="sum"
-        label="扣款合计">
-      </el-table-column>
-      <el-table-column
-        prop="shifa"
-        label="实发合计">
-      </el-table-column>
-    </el-table>
+      <el-table
+        :data="daiData"
+        stripe
+        style="width: 100%;margin-top: 10px">
+        <el-table-column
+          prop="pension"
+          label="养老扣费">
+        </el-table-column>
+        <el-table-column
+          prop="accumulation"
+          label="医保扣费">
+        </el-table-column>
+        <el-table-column
+          prop="medical"
+          label="失业扣费">
+        </el-table-column>
+        <el-table-column
+          prop="gonghui"
+          label="保险扣费合计">
+        </el-table-column>
+        <el-table-column
+          prop="nowork"
+          label="上月个税">
+        </el-table-column>
+        <el-table-column
+          prop="teacher"
+          label="实发工资">
+        </el-table-column>
+      </el-table>
     <div style="margin-top: 3vh">
       <el-row>
-
         <el-col :span="12" style="margin-top: 23px"> <chart-one/></el-col>
         <el-col :span="12"><chart-two/></el-col>
       </el-row>

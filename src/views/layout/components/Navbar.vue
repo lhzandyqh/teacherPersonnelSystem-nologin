@@ -89,7 +89,7 @@ export default {
     handleRolesChange() {
       console.log('handleRolesChange')
       // this.$router.push({ path: 'dashboard' })
-      // this.$router.go(0)
+      this.$router.go(0)
       // this.$router.push({ path: '/permission/index?' + +new Date() })
     },
     toggleSideBar() {

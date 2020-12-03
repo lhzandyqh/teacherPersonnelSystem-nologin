@@ -124,18 +124,6 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/reviewsubmission',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/alphaViews/reviewSubmission/index'),
-        name: 'reviewsubmission',
-        meta: { title: '审核提交', roles: ['教师'], icon: 'guide', noCache: true }
-      }
-    ]
-  },
   // {
   //   path: '/attendanceinformation',
   //   component: Layout,
@@ -156,7 +144,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/alphaViews/careerDevelopment/index'),
         name: 'careerDevelopment',
-        meta: { title: '职业发展', roles: ['教师'], icon: 'icon', noCache: true }
+        meta: { title: '发展规划', roles: ['教师'], icon: 'icon', noCache: true }
       }
     ]
   },
@@ -168,7 +156,19 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/alphaViews/workTasks/index'),
         name: 'worktasks',
-        meta: { title: '工作任务', roles: ['教师'], icon: 'example', noCache: true }
+        meta: { title: '任务提交', roles: ['教师'], icon: 'example', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/reviewsubmission',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/alphaViews/reviewSubmission/index'),
+        name: 'reviewsubmission',
+        meta: { title: '审核历史', roles: ['教师'], icon: 'guide', noCache: true }
       }
     ]
   },
