@@ -113,7 +113,7 @@
       name: "tableSocialTraining",
       data(){
         return{
-          dialogVisibleTwo: '',
+          dialogVisibleTwo: false,
           addMatchVisible:false,
           detailFlag:false,
           title:'',
