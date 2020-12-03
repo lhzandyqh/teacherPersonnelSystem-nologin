@@ -29,7 +29,7 @@
       <!--      </el-table-column>-->
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="medium" @click="changematch(scope.row)">修改</el-button>
+          <el-button type="text" size="medium" @click="lookDetail(scope.row)">查看详情</el-button>
           <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
         </template>
       </el-table-column>
@@ -78,11 +78,44 @@
               <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
+          <el-form-item label="附件上传">
+            <el-upload
+              class="upload-demo"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :http-request="uploadPic"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :before-remove="beforeRemove"
+              multiple
+              :limit="3"
+              :on-exceed="handleExceed"
+              :file-list="fileList"
+            >
+              <el-button size="small" type="primary">点击上传获奖证书封面页和内容页</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+            </el-upload>
+          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addMatchVisible = false">取 消</el-button>
           <el-button type="primary" @click="submitMatchSuccess">确 定</el-button>
         </div>
+      </el-dialog>
+      <el-dialog
+        title="详情"
+        :visible.sync="dialogVisibleTwo"
+        width="50%"
+        :before-close="handleClose"
+      >
+        <el-carousel indicator-position="outside" height="600px">
+          <el-carousel-item v-for="(src,item) in imgs" :key="item">
+            <img :src="src" style="max-width: 100%;max-height: 100%;display: block; margin: 0 auto;">
+          </el-carousel-item>
+        </el-carousel>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisibleTwo = false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisibleTwo = false">确 定</el-button>
+        </span>
       </el-dialog>
     </div>
   </div>
@@ -93,12 +126,13 @@
       name: "tableEducationAndTeachingAward",
       data(){
         return{
+          dialogVisibleTwo: false,
           addMatchVisible:false,
           detailFlag:false,
           title:'',
           form:{},
           detail:{},
-          matchData: []
+          matchData: [{}]
         }
       },
       methods: {
@@ -158,6 +192,9 @@
               message: '已取消删除'
             });
           });
+        },
+        lookDetail: function (row) {
+          this.dialogVisibleTwo = true
         }
       }
     }
