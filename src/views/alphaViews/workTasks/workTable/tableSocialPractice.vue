@@ -78,7 +78,8 @@
 </template>
 
 <script>
-import {getSocialdo,updateSocialdo} from "@/api/allTaskData.js"
+import {getSocialdo, updateSocialdo} from "../../../../api/allTaskData";
+
     export default {
       name: "tableSocialPractice",
       data(){
@@ -110,7 +111,7 @@ import {getSocialdo,updateSocialdo} from "@/api/allTaskData.js"
             practiceMoney:undefined,
             startDate:undefined,
             endDate:undefined,
-          
+
           }
         },
         //  getlist(){

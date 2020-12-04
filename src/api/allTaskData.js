@@ -1,10 +1,10 @@
 import request from '@/utils/request'
 
-export function updateSocial(parems) {
+export function updateSocial(data) {
     return request({
       url: '/tecWorkTask/teaSocialTrainInfoSet',
       method: 'post',
-      parems
+      data
     })
   }
   // 教师培训信息
@@ -16,11 +16,11 @@ export function updateSocial(parems) {
     })
   }
 
-  export function updateSocialdo(parems) {
+  export function updateSocialdo(data) {
     return request({
       url: '/tecWorkTask/teaSocialPracticeInfoSet',
       method: 'post',
-      parems
+      data
     })
   }
   // 教师培训do信息

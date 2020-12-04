@@ -88,7 +88,8 @@
 </template>
 
 <script>
-import {getSocial,updateSocial} from "@/api/allTaskData.js"
+import {getSocial, updateSocial} from "../../../../api/allTaskData";
+
     export default {
       name: "tableSocialTraining",
       data(){
@@ -150,7 +151,7 @@ import {getSocial,updateSocial} from "@/api/allTaskData.js"
         submitMatchSuccess(){
             this.$refs["form"].validate((valid) => {
               if (valid) {
-              this.form.tecUsername = 'rmyzAdmin'
+              this.form.tecUsername = 'rmyzAdmin';
               updateSocial(this.form).then(response => {
                 if (response.data.msg === '成功') {
                   this.$message({
@@ -166,7 +167,7 @@ import {getSocial,updateSocial} from "@/api/allTaskData.js"
               return false;
             }
       });
-       
+
         },
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
