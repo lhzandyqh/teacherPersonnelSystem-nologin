@@ -4,26 +4,26 @@
       <span style="">学术成果情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
-      <el-table-column prop="academicname" label="学术成果名称" >
+    <el-table :data="matchData.slice((currentPage - 1) * pageSize, currentPage * pageSize)" style="width: 100%" stripe>
+      <el-table-column prop="paperName" label="学术成果名称" >
       </el-table-column>
-      <el-table-column prop="academicform" label="学术成果类型">
+      <el-table-column prop="paperType" label="学术成果类型">
       </el-table-column>
-      <el-table-column prop="academicform" label="发表时间">
+      <el-table-column prop="pubDate" label="发表时间">
       </el-table-column>
-      <el-table-column prop="academictime" label="是否第一作者" >
+      <el-table-column prop="ifFirstAuthor" label="是否第一作者" >
       </el-table-column>
-      <el-table-column prop="academictime" label="刊物名称" >
+      <el-table-column prop="pubJournal" label="刊物名称" >
       </el-table-column>
-      <el-table-column prop="academictime" label="刊号" >
+      <el-table-column prop="issn" label="刊号" >
       </el-table-column>
-      <el-table-column prop="academictime" label="刊物等级" >
+      <el-table-column prop="journalLevel" label="刊物等级" >
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='未开始'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='待审核'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='已结束'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -42,8 +42,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="1"
-        :page-size="10"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[5, 10]"
         :total="matchData.length"
         layout="total, sizes, prev, pager, next, jumper"
@@ -51,32 +51,32 @@
     </div>
     <div>
       <el-dialog :visible.sync="addMatchVisible" :title="title">
-        <el-form ref="form" :model="form" label-width="100px">
-          <el-form-item label="学术成果名称">
-            <el-input v-model="form.academicname"/>
+        <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+          <el-form-item label="学术成果名称" prop="paperName">
+            <el-input v-model="form.paperName"/>
           </el-form-item>
-          <el-form-item label="发表时间">
+          <el-form-item label="学术成果类型" prop="paperType">
+            <el-input v-model="form.paperType"/>
+          </el-form-item>
+          <el-form-item label="发表时间" prop="pubDate">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.pubDate" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
-          <el-form-item label="是否第一作者">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+          <el-form-item label="是否第一作者" prop="ifFirstAuthor">
+            <el-select v-model="form.ifFirstAuthor" style="width: 250px" placeholder="请选择">
               <el-option label="是" value="是" />
               <el-option label="否" value="否" />
             </el-select>
           </el-form-item>
-          <el-form-item label="刊物名称">
-            <el-input v-model="form.academicname"/>
+          <el-form-item label="刊物名称" prop="pubJournal">
+            <el-input v-model="form.pubJournal"/>
           </el-form-item>
-          <el-form-item label="刊号">
-            <el-input v-model="form.academicname"/>
+          <el-form-item label="刊号" prop="issn">
+            <el-input v-model="form.issn"/>
           </el-form-item>
-          <el-form-item label="课题到款额">
-            <el-input v-model="form.academicname"/>
-          </el-form-item>
-          <el-form-item label="刊物等级">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+          <el-form-item label="刊物等级" prop="paperName">
+            <el-select v-model="form.journalLevel" style="width: 250px" placeholder="请选择">
               <el-option label="EI" value="EI" />
               <el-option label="SCI" value="SCI" />
               <el-option label="中文核心" value="中文核心" />
@@ -86,7 +86,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addMatchVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitMatchSuccess">确 定</el-button>
+          <el-button type="primary" @click="submitMatchSuccess('form')">确 定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -94,35 +94,67 @@
 </template>
 
 <script>
+import {addTeaPaperInfo, getTeaPaperInfos} from "../../../../api/allTaskData";
+
     export default {
       name: "tableParticipateProject",
       data(){
         return{
-          addMatchVisible:false,
-          detailFlag:false,
-          title:'',
-          form:{},
-          detail:{},
-          matchData: []
+          addMatchVisible: false,
+          detailFlag: false,
+          title: '',
+          form: {},
+          detail: {},
+          matchData: [],
+          tecUsername: 'rmyzAdmin',
+          currentPage: 1,
+          pageSize: 5,
+          rules: {
+            paperName: [
+              { required: true, message: '请输入学术成果名称', trigger: 'blur' },
+            ],
+            paperType: [
+              { required: true, message: '请输入学术成果类型', trigger: 'blur' },
+            ],
+            pubDate: [
+              { required: true, message: '请选择发表时间', trigger: 'change' },
+            ],
+            ifFirstAuthor: [
+              { required: true, message: '请选择是否第一作者', trigger: 'change' },
+            ],
+            pubJournal: [
+              { required: true, message: '请输入刊物名称', trigger: 'blur' },
+            ],
+            issn: [
+              { required: true, message: '请输入刊号', trigger: 'blur' },
+            ],
+            journalLevel: [
+              { required: true, message: '请选择刊物等级', trigger: 'change' },
+            ],
+          }
         }
+      },
+      mounted() {
+        this.getTableData(this.tecUsername);
       },
       methods: {
         handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
-            matchname:undefined,
-            matchtime:undefined,
-            matchsub:undefined,
-            matchprogress:undefined,
-            matchwork:undefined,
-            matchresult:undefined,
-            beizhu:undefined,
-          }
+            "ifFirstAuthor": "",
+            "issn": "",
+            "journalLevel": "",
+            "paperName": "",
+            "paperType": "",
+            "pubDate": "",
+            "pubJournal": "",
+            "tecUsername": ""
+          };
         },
         viewDetail(row){
           this.detailFlag = true
@@ -140,12 +172,25 @@
           this.form = row
           this.addMatchVisible = true;
         },
-        submitMatchSuccess(){
-          this.$message({
-            type:'success',
-            message:'提交成功'
-          })
-          this.addMatchVisible = false
+        submitMatchSuccess(formName){
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.form.tecUsername = this.tecUsername
+              addTeaPaperInfo(this.form).then(response => {
+                if (response.data.msg === '成功') {
+                  this.$message({
+                    type: 'success',
+                    message: '添加成功'
+                  });
+                  this.getTableData(this.tecUsername);
+                  this.addMatchVisible = false;
+                }
+              })
+            } else {
+              console.log('添加失败');
+              return false;
+            }
+          });
         },
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
@@ -163,7 +208,14 @@
               message: '已取消删除'
             });
           });
-        }
+        },
+        getTableData(tecUsername) {
+          getTeaPaperInfos({
+            tecUsername: tecUsername
+          }).then(response => {
+            this.matchData = response.data.data
+          })
+        },
       }
     }
 </script>

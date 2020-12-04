@@ -4,20 +4,20 @@
       <span style="">科研成果获奖情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
-      <el-table-column prop="academicname" label="科研成果名称" >
+    <el-table :data="matchData.slice((currentPage - 1) * pageSize, currentPage * pageSize)" style="width: 100%" stripe>
+      <el-table-column prop="achieveName" label="科研成果名称" >
       </el-table-column>
-      <el-table-column prop="academicform" label="科研成果类别">
+      <el-table-column prop="achieveType" label="科研成果类型">
       </el-table-column>
-      <el-table-column prop="academicform" label="科研成果级别">
+      <el-table-column prop="achieveLevel" label="科研成果级别">
       </el-table-column>
-      <el-table-column prop="academictime" label="获奖时间" >
+      <el-table-column prop="achieveDate" label="取得日期" >
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus === '未开始'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus === '待审核'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.auditStatus === '已结束'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -36,8 +36,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="1"
-        :page-size="10"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[5, 10]"
         :total="matchData.length"
         layout="total, sizes, prev, pager, next, jumper"
@@ -71,7 +71,7 @@
           <el-form-item label="附件上传">
             <el-upload
               class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
+              action="/upload/fileUpdate"
               :http-request="uploadPic"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
@@ -112,6 +112,8 @@
 </template>
 
 <script>
+import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
+
     export default {
       name: "tableResearchAchievements",
       data(){
@@ -122,15 +124,44 @@
           title:'',
           form:{},
           detail:{},
-          matchData: [{}]
+          matchData: [],
+          tecUsername: 'rmyzAdmin',
+          currentPage: 1,
+          pageSize: 5,
+          rules: {
+            paperName: [
+              { required: true, message: '请输入学术成果名称', trigger: 'blur' },
+            ],
+            paperType: [
+              { required: true, message: '请输入学术成果类型', trigger: 'blur' },
+            ],
+            pubDate: [
+              { required: true, message: '请选择发表时间', trigger: 'change' },
+            ],
+            ifFirstAuthor: [
+              { required: true, message: '请选择是否第一作者', trigger: 'change' },
+            ],
+            pubJournal: [
+              { required: true, message: '请输入刊物名称', trigger: 'blur' },
+            ],
+            issn: [
+              { required: true, message: '请输入刊号', trigger: 'blur' },
+            ],
+            journalLevel: [
+              { required: true, message: '请选择刊物等级', trigger: 'change' },
+            ],
+          }
         }
+      },
+      mounted() {
+        this.getTableData(this.tecUsername);
       },
       methods: {
         handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
@@ -185,7 +216,14 @@
         },
         lookDetail: function (row) {
           this.dialogVisibleTwo = true
-        }
+        },
+        getTableData(tecUsername) {
+          getTeaSciAchieveInfos({
+            tecUsername: tecUsername
+          }).then(response => {
+            this.matchData = response.data.data
+          })
+        },
       }
     }
 </script>
