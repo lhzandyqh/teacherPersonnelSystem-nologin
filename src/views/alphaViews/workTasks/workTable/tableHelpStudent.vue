@@ -5,23 +5,23 @@
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
     <el-table :data="matchData" style="width: 100%" stripe>
-      <el-table-column prop="academicname" label="帮扶学生姓名" >
+      <el-table-column prop="stuName" label="帮扶学生姓名" >
       </el-table-column>
-      <el-table-column prop="academicform" label="学生所在专业">
+      <el-table-column prop="stuMajor" label="学生所在专业">
       </el-table-column>
-      <el-table-column prop="academicform" label="学生学号">
+      <el-table-column prop="stuId" label="学生学号">
       </el-table-column>
-      <el-table-column prop="academicform" label="帮扶工作明细">
+      <el-table-column prop="assistDetail" label="帮扶工作明细">
       </el-table-column>
-      <el-table-column prop="academicform" label="开始时间">
+      <el-table-column prop="startDate" label="开始时间">
       </el-table-column>
-      <el-table-column prop="academicform" label="结束时间">
+      <el-table-column prop="endDate" label="结束时间">
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='未开始'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='待审核'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='已结束'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -31,8 +31,8 @@
       <!--      </el-table-column>-->
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="medium" @click="changematch(scope.row)">修改</el-button>
-          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
+          <!-- <el-button type="text" size="medium" @click="changematch(scope.row)">修改</el-button> -->
+          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework" disabled>删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,25 +51,25 @@
       <el-dialog :visible.sync="addMatchVisible" :title="title">
         <el-form ref="form" :model="form" label-width="100px">
           <el-form-item label="帮扶学生姓名">
-            <el-input v-model="form.academicname"/>
+            <el-input v-model="form.stuName"/>
           </el-form-item>
           <el-form-item label="学生所在专业">
-            <el-input v-model="form.academicname"/>
+            <el-input v-model="form.stuMajor"/>
           </el-form-item>
           <el-form-item label="学生学号">
-            <el-input v-model="form.academicname"/>
+            <el-input v-model="form.stuId"/>
           </el-form-item>
           <el-form-item label="帮扶工作明细">
-            <el-input v-model="form.academicname"/>
+            <el-input v-model="form.assistDetail"/>
           </el-form-item>
           <el-form-item label="开始时间">
             <el-col :span="11">
-            <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+            <el-date-picker v-model="form.startDate" value-format="yyyy-MM-dd" format="yyyy-MM-dd"  placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
           <el-form-item label="结束时间">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.endDate" value-format="yyyy-MM-dd" format="yyyy-MM-dd"  placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
         </el-form>
@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { teaAssistStuInfosGetByTecUsername, teaAssistStuInfoSet } from '@/api/tecWorkTask'
     export default {
       name: "tableSocialTraining",
       data(){
@@ -94,6 +95,9 @@
           detail:{},
           matchData: []
         }
+      },
+      mounted() {
+        this.getList()
       },
       methods: {
         handleSizeChange(val) {
@@ -130,12 +134,26 @@
           this.addMatchVisible = true;
         },
         submitMatchSuccess(){
-          this.$message({
-            type:'success',
-            message:'提交成功'
+          console.log("Form", this.form)
+          this.form.tecUsername = 'rmyzAdmin'
+           console.log("Form", this.form)
+          teaAssistStuInfoSet(this.form).then(res => {
+            if(res.data.code === 0) {
+              this.$message({
+                type:'success',
+                message:res.data.msg
+              })
+              this.addMatchVisible = false
+              this.getList()
+            }
           })
-          this.addMatchVisible = false
+          // this.$message({
+          //   type:'success',
+          //   message:'提交成功'
+          // })
+          // this.addMatchVisible = false
         },
+        
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
             confirmButtonText: '确定',
@@ -152,6 +170,12 @@
               message: '已取消删除'
             });
           });
+        },
+        getList() {
+          var username = 'rmyzAdmin'
+          teaAssistStuInfosGetByTecUsername(username).then(res => {
+            this.matchData = res.data.data
+          })
         }
       }
     }
