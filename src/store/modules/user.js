@@ -46,10 +46,16 @@ const user = {
   actions: {
     // 用户名登录
     LoginByUsername({ commit }, userInfo) {
-      const username = userInfo.username.trim()
+      const username = userInfo.userName.trim()
       return new Promise((resolve, reject) => {
-        loginByUsername(username, userInfo.password).then(response => {
+        const prams = {
+          userName: username,
+          role: userInfo.role
+        }
+        loginByUsername(prams).then(response => {
           const data = response.data
+          console.log('登陆测试登陆返回的数据')
+          console.log(data)
           commit('SET_TOKEN', data.token)
           setToken(response.data.token)
           resolve()
@@ -62,8 +68,47 @@ const user = {
     // 获取用户信息
     GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
+        // console.log('测试state.token')
+        // console.log(state.token)
+        // var mytoken
+        // if(state.token === 'admin'){
+        //   mytoken = '人事处主管'
+        // }else if(state.token === 'editor'){
+        //   mytoken = '教师'
+        // }else if(state.token === 'editortwo'){
+        //   mytoken = '系部主管'
+        // }
+        // const prams = {
+        //   userName: '10011',
+        //   role: mytoken
+        // }
+        // console.log(prams)
+        // getUserInfo(prams).then(response => {
+        //   // 由于mockjs 不支持自定义状态码只能这样hack
+        //   console.log('测试getUserInfo调用成功返回的数据')
+        //   console.log(response.data)
+        //   if (!response.data) {
+        //     reject('Verification failed, please login again.')
+        //   }
+        //   const data = response.data
+        //
+        //   if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
+        //     commit('SET_ROLES', data.roles)
+        //   } else {
+        //     reject('getInfo: roles must be a non-null array!')
+        //   }
+        //
+        //   commit('SET_NAME', data.name)
+        //   commit('SET_AVATAR', data.avatar)
+        //   commit('SET_INTRODUCTION', data.introduction)
+        //   resolve(response)
+        // }).catch(error => {
+        //   reject(error)
+        // })
         getUserInfo(state.token).then(response => {
           // 由于mockjs 不支持自定义状态码只能这样hack
+          console.log('测试getUserInfo调用成功返回的数据')
+          console.log(response.data)
           if (!response.data) {
             reject('Verification failed, please login again.')
           }

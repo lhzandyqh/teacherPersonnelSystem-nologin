@@ -325,8 +325,8 @@
       return {
         checked: false,
         loginForm: {
-          username: 'admin',
-          password: '111111'
+          userName: '10011',
+          role: ''
         },
         loginRules: {
           username: [{ required: true, trigger: 'blur', validator: validateUsername }],

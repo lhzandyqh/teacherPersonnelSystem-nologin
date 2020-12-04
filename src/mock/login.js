@@ -45,6 +45,10 @@ export default {
   },
   getUserInfo: config => {
     const { token } = param2Obj(config.url)
+    console.log('mock调用getuserinfo')
+    console.log(config.url)
+    console.log(param2Obj(config.url))
+    console.log(token)
     if (userMap[token]) {
       return userMap[token]
     } else {

@@ -48,7 +48,10 @@ const permission = {
   actions: {
     GenerateRoutes({ commit }, data) {
       return new Promise(resolve => {
+        console.log('测试generateRoutes中的data')
+        console.log(data)
         const { roles } = data
+        console.log(roles)
         let accessedRoutes
         if (roles.includes('admin')) {
           accessedRoutes = asyncRoutes
