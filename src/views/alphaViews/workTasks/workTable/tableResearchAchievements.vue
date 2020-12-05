@@ -45,41 +45,39 @@
     </div>
     <div>
       <el-dialog :visible.sync="addMatchVisible" :title="title">
-        <el-form ref="form" :model="form" label-width="100px">
-          <el-form-item label="科研成果名称">
-            <el-input v-model="form.academicname"/>
+        <el-form ref="form" :model="form" :rules="rules" label-width="130px">
+          <el-form-item label="科研成果名称" prop="achieveName">
+            <el-input v-model="form.achieveName"/>
           </el-form-item>
-          <el-form-item label="科研成果类别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+          <el-form-item label="科研成果类别" prop="achieveType">
+            <el-select v-model="form.achieveType" style="width: 250px" placeholder="请选择">
               <el-option label="科学技术奖" value="科学技术奖" />
               <el-option label="科技进步奖" value="科技进步奖" />
               <el-option label="技术发明奖" value="技术发明奖" />
             </el-select>
           </el-form-item>
-          <el-form-item label="科研成果级别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+          <el-form-item label="科研成果级别" prop="achieveLevel">
+            <el-select v-model="form.achieveLevel" style="width: 250px" placeholder="请选择">
               <el-option label="国家级" value="国家级" />
               <el-option label="省级" value="省级" />
               <el-option label="市级" value="市级" />
             </el-select>
           </el-form-item>
-          <el-form-item label="获奖时间">
+          <el-form-item label="获奖时间" prop="achieveDate">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.achieveDate" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
           <el-form-item label="附件上传">
             <el-upload
               class="upload-demo"
-              action="/upload/fileUpdate"
-              :http-request="uploadPic"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
+              action="https://zhongkeruitong.top/yz_student/upload/fileUpdate"
+              accept=".jpg, .png"
+              :on-success="uploadSuccess"
+              :on-remove="uploadRemove"
               multiple
               :limit="3"
-              :on-exceed="handleExceed"
-              :file-list="fileList"
+              :file-list="uploadImg"
             >
               <el-button size="small" type="primary">点击上传获奖证书封面页和内容页</el-button>
               <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
@@ -88,17 +86,16 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addMatchVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitMatchSuccess">确 定</el-button>
+          <el-button type="primary" @click="submitMatchSuccess('form')">确 定</el-button>
         </div>
       </el-dialog>
       <el-dialog
         title="详情"
         :visible.sync="dialogVisibleTwo"
         width="50%"
-        :before-close="handleClose"
       >
         <el-carousel indicator-position="outside" height="600px">
-          <el-carousel-item v-for="(src,item) in imgs" :key="item">
+          <el-carousel-item v-for="(src,item) in picture" :key="item">
             <img :src="src" style="max-width: 100%;max-height: 100%;display: block; margin: 0 auto;">
           </el-carousel-item>
         </el-carousel>
@@ -112,9 +109,9 @@
 </template>
 
 <script>
-import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
+import {addTeaSciAchieveInfo, getTeaSciAchieveInfos} from "../../../../api/allTaskData";
 
-    export default {
+export default {
       name: "tableResearchAchievements",
       data(){
         return{
@@ -129,28 +126,22 @@ import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
           currentPage: 1,
           pageSize: 5,
           rules: {
-            paperName: [
-              { required: true, message: '请输入学术成果名称', trigger: 'blur' },
+            achieveName: [
+              { required: true, message: '请输入科研成果名称', trigger: 'blur' },
             ],
-            paperType: [
-              { required: true, message: '请输入学术成果类型', trigger: 'blur' },
+            achieveType: [
+              { required: true, message: '请选择科研成果类别', trigger: 'change' },
             ],
-            pubDate: [
-              { required: true, message: '请选择发表时间', trigger: 'change' },
+            achieveLevel: [
+              { required: true, message: '请选择科研成果级别', trigger: 'change' },
             ],
-            ifFirstAuthor: [
-              { required: true, message: '请选择是否第一作者', trigger: 'change' },
+            achieveDate: [
+              { required: true, message: '请选择获奖时间', trigger: 'change' },
             ],
-            pubJournal: [
-              { required: true, message: '请输入刊物名称', trigger: 'blur' },
-            ],
-            issn: [
-              { required: true, message: '请输入刊号', trigger: 'blur' },
-            ],
-            journalLevel: [
-              { required: true, message: '请选择刊物等级', trigger: 'change' },
-            ],
-          }
+          },
+          uploadImg: [],
+          uploadImgUri: [],
+          picture: []
         }
       },
       mounted() {
@@ -163,15 +154,14 @@ import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
         handleCurrentChange(val) {
           this.currentPage = val;
         },
-        reset(){
+        reset() {
           this.form = {
-            matchname:undefined,
-            matchtime:undefined,
-            matchsub:undefined,
-            matchprogress:undefined,
-            matchwork:undefined,
-            matchresult:undefined,
-            beizhu:undefined,
+            "achieveDate": "",
+            "achieveLevel": "",
+            "achieveName": "",
+            "achieveType": "",
+            "picture": [],
+            "tecUsername": ""
           }
         },
         viewDetail(row){
@@ -190,12 +180,33 @@ import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
           this.form = row
           this.addMatchVisible = true;
         },
-        submitMatchSuccess(){
-          this.$message({
-            type:'success',
-            message:'提交成功'
+        submitMatchSuccess(formName) {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.form.tecUsername = this.tecUsername
+              if (this.uploadImgUri.length === 0) {
+                this.$message.error('请上传图片');
+                return false;
+              } else {
+                this.form.picture = this.uploadImgUri.toString();
+                addTeaSciAchieveInfo(this.form).then(response => {
+                  if (response.data.msg === '成功') {
+                    this.$message({
+                      type: 'success',
+                      message: '添加成功'
+                    });
+                    this.uploadImg = [];
+                    this.uploadImgUri = [];
+                    this.getTableData(this.tecUsername);
+                    this.addMatchVisible = false;
+                  }
+                })
+              }
+            } else {
+              console.log('添加失败');
+              return false;
+            }
           })
-          this.addMatchVisible = false
         },
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
@@ -215,7 +226,8 @@ import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
           });
         },
         lookDetail: function (row) {
-          this.dialogVisibleTwo = true
+          this.picture = row.picture;
+          this.dialogVisibleTwo = true;
         },
         getTableData(tecUsername) {
           getTeaSciAchieveInfos({
@@ -224,6 +236,12 @@ import {getTeaSciAchieveInfos} from "../../../../api/allTaskData";
             this.matchData = response.data.data
           })
         },
+        uploadSuccess(response, file, fileList) {
+          this.uploadImgUri.push(response.data.fileUrl);
+        },
+        uploadRemove(file, fileList) {
+          this.uploadImgUri.pop();
+        }
       }
     }
 </script>
