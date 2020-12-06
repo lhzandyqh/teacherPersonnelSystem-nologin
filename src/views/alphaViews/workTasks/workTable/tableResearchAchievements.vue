@@ -4,20 +4,20 @@
       <span style="">科研成果获奖情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
-      <el-table-column prop="academicname" label="科研成果名称" >
+    <el-table :data="matchData.slice((currentPage - 1) * pageSize, currentPage * pageSize)" style="width: 100%" stripe>
+      <el-table-column prop="achieveName" label="科研成果名称" >
       </el-table-column>
-      <el-table-column prop="academicform" label="科研成果类别">
+      <el-table-column prop="achieveType" label="科研成果类型">
       </el-table-column>
-      <el-table-column prop="academicform" label="科研成果级别">
+      <el-table-column prop="achieveLevel" label="科研成果级别">
       </el-table-column>
-      <el-table-column prop="academictime" label="获奖时间" >
+      <el-table-column prop="achieveDate" label="取得日期" >
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus === '未开始'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus === '待审核'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.auditStatus === '已结束'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -36,8 +36,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="1"
-        :page-size="10"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[5, 10]"
         :total="matchData.length"
         layout="total, sizes, prev, pager, next, jumper"
@@ -45,41 +45,39 @@
     </div>
     <div>
       <el-dialog :visible.sync="addMatchVisible" :title="title">
-        <el-form ref="form" :model="form" label-width="100px">
-          <el-form-item label="科研成果名称">
-            <el-input v-model="form.academicname"/>
+        <el-form ref="form" :model="form" :rules="rules" label-width="130px">
+          <el-form-item label="科研成果名称" prop="achieveName">
+            <el-input v-model="form.achieveName"/>
           </el-form-item>
-          <el-form-item label="科研成果类别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+          <el-form-item label="科研成果类别" prop="achieveType">
+            <el-select v-model="form.achieveType" style="width: 250px" placeholder="请选择">
               <el-option label="科学技术奖" value="科学技术奖" />
               <el-option label="科技进步奖" value="科技进步奖" />
               <el-option label="技术发明奖" value="技术发明奖" />
             </el-select>
           </el-form-item>
-          <el-form-item label="科研成果级别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+          <el-form-item label="科研成果级别" prop="achieveLevel">
+            <el-select v-model="form.achieveLevel" style="width: 250px" placeholder="请选择">
               <el-option label="国家级" value="国家级" />
               <el-option label="省级" value="省级" />
               <el-option label="市级" value="市级" />
             </el-select>
           </el-form-item>
-          <el-form-item label="获奖时间">
+          <el-form-item label="获奖时间" prop="achieveDate">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.achieveDate" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
           <el-form-item label="附件上传">
             <el-upload
               class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :http-request="uploadPic"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
+              action="https://zhongkeruitong.top/yz_student/upload/fileUpdate"
+              accept=".jpg, .png"
+              :on-success="uploadSuccess"
+              :on-remove="uploadRemove"
               multiple
               :limit="3"
-              :on-exceed="handleExceed"
-              :file-list="fileList"
+              :file-list="uploadImg"
             >
               <el-button size="small" type="primary">点击上传获奖证书封面页和内容页</el-button>
               <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
@@ -88,17 +86,16 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="addMatchVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitMatchSuccess">确 定</el-button>
+          <el-button type="primary" @click="submitMatchSuccess('form')">确 定</el-button>
         </div>
       </el-dialog>
       <el-dialog
         title="详情"
         :visible.sync="dialogVisibleTwo"
         width="50%"
-        :before-close="handleClose"
       >
         <el-carousel indicator-position="outside" height="600px">
-          <el-carousel-item v-for="(src,item) in imgs" :key="item">
+          <el-carousel-item v-for="(src,item) in picture" :key="item">
             <img :src="src" style="max-width: 100%;max-height: 100%;display: block; margin: 0 auto;">
           </el-carousel-item>
         </el-carousel>
@@ -112,7 +109,9 @@
 </template>
 
 <script>
-    export default {
+import {addTeaSciAchieveInfo, getTeaSciAchieveInfos} from "../../../../api/allTaskData";
+
+export default {
       name: "tableResearchAchievements",
       data(){
         return{
@@ -122,25 +121,47 @@
           title:'',
           form:{},
           detail:{},
-          matchData: [{}]
+          matchData: [],
+          tecUsername: 'rmyzAdmin',
+          currentPage: 1,
+          pageSize: 5,
+          rules: {
+            achieveName: [
+              { required: true, message: '请输入科研成果名称', trigger: 'blur' },
+            ],
+            achieveType: [
+              { required: true, message: '请选择科研成果类别', trigger: 'change' },
+            ],
+            achieveLevel: [
+              { required: true, message: '请选择科研成果级别', trigger: 'change' },
+            ],
+            achieveDate: [
+              { required: true, message: '请选择获奖时间', trigger: 'change' },
+            ],
+          },
+          uploadImg: [],
+          uploadImgUri: [],
+          picture: []
         }
+      },
+      mounted() {
+        this.getTableData(this.tecUsername);
       },
       methods: {
         handleSizeChange(val) {
-          console.log(`每页 ${val} 条`);
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
-          console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
-        reset(){
+        reset() {
           this.form = {
-            matchname:undefined,
-            matchtime:undefined,
-            matchsub:undefined,
-            matchprogress:undefined,
-            matchwork:undefined,
-            matchresult:undefined,
-            beizhu:undefined,
+            "achieveDate": "",
+            "achieveLevel": "",
+            "achieveName": "",
+            "achieveType": "",
+            "picture": [],
+            "tecUsername": ""
           }
         },
         viewDetail(row){
@@ -159,12 +180,33 @@
           this.form = row
           this.addMatchVisible = true;
         },
-        submitMatchSuccess(){
-          this.$message({
-            type:'success',
-            message:'提交成功'
+        submitMatchSuccess(formName) {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.form.tecUsername = this.tecUsername
+              if (this.uploadImgUri.length === 0) {
+                this.$message.error('请上传图片');
+                return false;
+              } else {
+                this.form.picture = this.uploadImgUri.toString();
+                addTeaSciAchieveInfo(this.form).then(response => {
+                  if (response.data.msg === '成功') {
+                    this.$message({
+                      type: 'success',
+                      message: '添加成功'
+                    });
+                    this.uploadImg = [];
+                    this.uploadImgUri = [];
+                    this.getTableData(this.tecUsername);
+                    this.addMatchVisible = false;
+                  }
+                })
+              }
+            } else {
+              console.log('添加失败');
+              return false;
+            }
           })
-          this.addMatchVisible = false
         },
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
@@ -184,7 +226,21 @@
           });
         },
         lookDetail: function (row) {
-          this.dialogVisibleTwo = true
+          this.picture = row.picture;
+          this.dialogVisibleTwo = true;
+        },
+        getTableData(tecUsername) {
+          getTeaSciAchieveInfos({
+            tecUsername: tecUsername
+          }).then(response => {
+            this.matchData = response.data.data
+          })
+        },
+        uploadSuccess(response, file, fileList) {
+          this.uploadImgUri.push(response.data.fileUrl);
+        },
+        uploadRemove(file, fileList) {
+          this.uploadImgUri.pop();
         }
       }
     }
