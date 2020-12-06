@@ -4,7 +4,7 @@
       <span style="">帮扶学生情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
+    <el-table :data="matchData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" stripe>
       <el-table-column prop="stuName" label="帮扶学生姓名" >
       </el-table-column>
       <el-table-column prop="stuMajor" label="学生所在专业">
@@ -93,7 +93,9 @@ import { teaAssistStuInfosGetByTecUsername, teaAssistStuInfoSet } from '@/api/te
           title:'',
           form:{},
           detail:{},
-          matchData: []
+          matchData: [],
+          currentPage: 1, // 当前页码
+          pageSize: 1 // 每页的数据条数
         }
       },
       mounted() {
@@ -102,9 +104,12 @@ import { teaAssistStuInfosGetByTecUsername, teaAssistStuInfoSet } from '@/api/te
       methods: {
         handleSizeChange(val) {
           console.log(`每页 ${val} 条`);
+          this.currentPage = 1;
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
           console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
