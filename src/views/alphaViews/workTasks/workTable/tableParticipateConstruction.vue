@@ -5,19 +5,19 @@
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
     <el-table :data="matchData" style="width: 100%" stripe>
-      <el-table-column prop="academicname" label="建设内容" >
+      <el-table-column prop="constructContent" label="建设内容" >
       </el-table-column>
-      <el-table-column prop="academicform" label="建设类别">
+      <el-table-column prop="constructType" label="建设类别">
       </el-table-column>
-      <el-table-column prop="academictime" label="建设开始时间" >
+      <el-table-column prop="startDate" label="建设开始时间" >
       </el-table-column>
-      <el-table-column prop="academictime" label="建设结束时间" >
+      <el-table-column prop="endDate" label="建设结束时间" >
       </el-table-column>
       <el-table-column label="审核状态">
-        <template slot-scope="scope">
-          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>
+        <template slot-scope="scope" >
+          <el-tag  v-if="scope.row.checkStatus==='未开始'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核待通过'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='已结束'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -47,24 +47,24 @@
       <el-dialog :visible.sync="addMatchVisible" :title="title">
         <el-form ref="form" :model="form" label-width="100px">
           <el-form-item label="建设内容">
-            <el-input v-model="form.academicname"/>
+            <el-input v-model="form.constructContent"/>
           </el-form-item>
           <el-form-item label="建设类别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
-              <el-option label="专业建设" value="临床医学" />
-              <el-option label="课程建设" value="口腔医学" />
-              <el-option label="重大工程建设" value="护理学" />
+            <el-select v-model="form.constructType" style="width: 250px" placeholder="请选择">
+              <el-option label="专业建设" value="专业建设" />
+              <el-option label="课程建设" value="课程建设" />
+              <el-option label="重大工程建设" value="重大工程建设" />
               <el-option label="实训基地建设" value="实训基地建设" />
             </el-select>
           </el-form-item>
           <el-form-item label="建设开始时间">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.startDate" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
           <el-form-item label="建设结束时间">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.endDate" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
         </el-form>
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import {addConstruct,getConstruct} from '@/api/join'
     export default {
       name: "tableParticipateConstruction",
       data(){
@@ -89,6 +90,9 @@
           detail:{},
           matchData: []
         }
+      },
+      mounted() {
+        this.getList()
       },
       methods: {
         handleSizeChange(val) {
@@ -114,6 +118,7 @@
           this.detail = row
           console.log(row)
         },
+        //新增按钮
         addMatch(){
           this.reset()
           this.title = '增加参与建设情况'
@@ -124,12 +129,21 @@
           this.form = row
           this.addMatchVisible = true;
         },
+        //新增的确定按钮
         submitMatchSuccess(){
-          this.$message({
-            type:'success',
-            message:'提交成功'
+          this.form.usrName = '101'
+          console.log("Form", this.form)
+          addConstruct(this.form).then(res => {
+            if(res.data.code === 0) {
+              this.$message({
+                type:'success',
+                message:res.data.msg
+              })
+              this.addMatchVisible = false
+              this.getList()
+            }
+
           })
-          this.addMatchVisible = false
         },
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
@@ -147,6 +161,15 @@
               message: '已取消删除'
             });
           });
+        },
+        getList() {
+          var username = '101'
+          getConstruct({
+            usrname:username
+          }).then(res => {
+            this.matchData = res.data.data
+            console.log("全部数据zm",this.matchData)
+          })
         }
       }
     }
