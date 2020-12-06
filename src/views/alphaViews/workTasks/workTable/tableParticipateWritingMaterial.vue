@@ -4,7 +4,7 @@
       <span style="">参与编写教材情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
+    <el-table :data="matchData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" stripe>
       <el-table-column prop="textbookName" label="教材名称" >
       </el-table-column>
       <el-table-column prop="particiForm" label="参与形式">
@@ -95,7 +95,9 @@ import {addbook,getbook} from '@/api/join'
           title:'',
           form:{},
           detail:{},
-          matchData: []
+          matchData: [],
+          currentPage: 1, // 当前页码
+          pageSize: 1 // 每页的数据条数
         }
       },
       mounted() {
@@ -104,9 +106,12 @@ import {addbook,getbook} from '@/api/join'
       methods: {
         handleSizeChange(val) {
           console.log(`每页 ${val} 条`);
+          this.currentPage = 1;
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
           console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
@@ -137,7 +142,7 @@ import {addbook,getbook} from '@/api/join'
         },
         submitMatchSuccess(){
           //this.form.usrName = 'rmyzAdmin'
-           this.form.usrName = '101'
+           this.form.usrName = '1200'
           console.log("Form123", this.form)
           addbook(this.form).then(res => {
             if(res.data.code === 0) {
@@ -169,7 +174,7 @@ import {addbook,getbook} from '@/api/join'
           });
         },
         getList() {
-          var username = 'rmyzAdmin'
+          var username = '1200'
           //var username = '10011'
           getbook({
             usrname:username
