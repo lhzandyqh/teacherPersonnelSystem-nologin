@@ -4,7 +4,7 @@
       <span style="">参与建设情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
+    <el-table :data="matchData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" stripe>
       <el-table-column prop="constructContent" label="建设内容" >
       </el-table-column>
       <el-table-column prop="constructType" label="建设类别">
@@ -88,7 +88,9 @@ import {addConstruct,getConstruct} from '@/api/join'
           title:'',
           form:{},
           detail:{},
-          matchData: []
+          matchData: [],
+          currentPage: 1, // 当前页码
+          pageSize: 1 // 每页的数据条数
         }
       },
       mounted() {
@@ -97,9 +99,12 @@ import {addConstruct,getConstruct} from '@/api/join'
       methods: {
         handleSizeChange(val) {
           console.log(`每页 ${val} 条`);
+          this.currentPage = 1;
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
           console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
