@@ -34,7 +34,7 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="medium" @click="changematch(scope.row)">修改</el-button>
-          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
+          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" disabled="true" @click="deletework">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -108,7 +108,7 @@ import {addTeaPaperInfo, getTeaPaperInfos} from "../../../../api/allTaskData";
           matchData: [],
           tecUsername: 'rmyzAdmin',
           currentPage: 1,
-          pageSize: 5,
+          pageSize: 10,
           rules: {
             paperName: [
               { required: true, message: '请输入学术成果名称', trigger: 'blur' },

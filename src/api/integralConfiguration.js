@@ -26,3 +26,19 @@ export function updateScoreConfig(parems) {
     params: parems
   })
 }
+
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+

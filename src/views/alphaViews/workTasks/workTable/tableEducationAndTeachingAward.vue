@@ -4,23 +4,23 @@
       <span style="">教育教学获奖情况</span>
       <div style="float: right;margin-right: 1.5rem"><el-button type="text" size="medium" @click="addMatch">新增</el-button></div>
     </div>
-    <el-table :data="matchData" style="width: 100%" stripe>
-      <el-table-column prop="academicname" label="赛事名称" >
+    <el-table :data="matchData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" stripe>
+      <el-table-column prop="contestName" label="赛事名称" >
       </el-table-column>
-      <el-table-column prop="academicform" label="赛事类别">
+      <el-table-column prop="contestType" label="赛事类别">
       </el-table-column>
-      <el-table-column prop="academictime" label="赛事级别" >
+      <el-table-column prop="contestLevel" label="赛事级别" >
       </el-table-column>
-      <el-table-column prop="academictime" label="获奖级别" >
+      <el-table-column prop="awardLevel" label="获奖级别" >
       </el-table-column>
-      <el-table-column prop="academictime" label="获奖时间" >
+      <el-table-column prop="awardDate" label="获奖时间" >
       </el-table-column>
-      <el-table-column label="审核状态">
-        <template slot-scope="scope">
-          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>
-        </template>
+      <el-table-column label="审核状态" prop="checkStatus">
+<!--        <template slot-scope="scope">-->
+<!--          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>-->
+<!--          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>-->
+<!--          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>-->
+<!--        </template>-->
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
       <!--        <template slot-scope="scope">-->
@@ -30,7 +30,7 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="medium" @click="lookDetail(scope.row)">查看详情</el-button>
-          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
+          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework" disabled="true">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -38,8 +38,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="1"
-        :page-size="10"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[5, 10]"
         :total="matchData.length"
         layout="total, sizes, prev, pager, next, jumper"
@@ -49,24 +49,24 @@
       <el-dialog :visible.sync="addMatchVisible" :title="title">
         <el-form ref="form" :model="form" label-width="100px">
           <el-form-item label="赛事名称">
-            <el-input v-model="form.academicname"/>
+            <el-input v-model="form.contestName"/>
           </el-form-item>
           <el-form-item label="赛事类别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+            <el-select v-model="form.contestType" style="width: 250px" placeholder="请选择">
               <el-option label="教学能力比赛" value="临床医学" />
               <el-option label="专业技能竞赛" value="口腔医学" />
               <el-option label="教学质量工程" value="护理学" />
             </el-select>
           </el-form-item>
           <el-form-item label="赛事级别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+            <el-select v-model="form.contestLevel" style="width: 250px" placeholder="请选择">
               <el-option label="国家级" value="国家级" />
               <el-option label="省级" value="省级" />
               <el-option label="院级" value="院级" />
             </el-select>
           </el-form-item>
           <el-form-item label="获奖级别">
-            <el-select v-model="form.academicform" style="width: 250px" placeholder="请选择">
+            <el-select v-model="form.awardLevel" style="width: 250px" placeholder="请选择">
               <el-option label="一等奖" value="一等奖" />
               <el-option label="二等奖" value="二等奖" />
               <el-option label="三等奖" value="三等奖" />
@@ -75,7 +75,7 @@
           </el-form-item>
           <el-form-item label="获奖时间">
             <el-col :span="11">
-              <el-date-picker v-model="form.academictime" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
+              <el-date-picker v-model="form.awardDate" value-format=" yyyy-MM-dd " format="yyyy-MM-dd " type="date" placeholder="选择日期" style="width: 60%;"/>
             </el-col>
           </el-form-item>
           <el-form-item label="附件上传">
@@ -122,6 +122,8 @@
 </template>
 
 <script>
+  import {eduAndTeachAdd, eduAndTeachSelect} from '@/api/taskSubmiss'
+  import { uploadPicture } from '@/api/personalInformation'
     export default {
       name: "tableEducationAndTeachingAward",
       data(){
@@ -132,15 +134,37 @@
           title:'',
           form:{},
           detail:{},
-          matchData: [{}]
+          matchData: [],
+          picUrl: [],
+          fileList: [],
+          imgs: [],
+          currentPage: 1, // 当前页码
+          pageSize: 10 // 每页的数据条数
         }
       },
+      mounted() {
+        this.getEduList()
+      },
       methods: {
+        getEduList () {
+          const username = 'rmyzAdmin';
+          eduAndTeachSelect({
+            usrname: username
+          }).then(res => {
+            if (res.data.code === 0) {
+              console.log('huojiang:', res.data)
+              this.matchData = res.data.data
+            }
+          })
+        },
         handleSizeChange(val) {
           console.log(`每页 ${val} 条`);
+          // this.currentPage = 1;
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
           console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
@@ -170,11 +194,23 @@
           this.addMatchVisible = true;
         },
         submitMatchSuccess(){
-          this.$message({
-            type:'success',
-            message:'提交成功'
+          const username = 'rmyzAdmin';
+          this.form.usrName = username
+          this.form.picture = this.picUrl.join(',')
+          console.log('文件列表：', this.form)
+          eduAndTeachAdd(this.form).then(res => {
+            if (res.data.code === 0) {
+              // this.matchData.push(res.data.data)
+              this.getEduList()
+              this.$message({
+                type:'success',
+                message:'提交成功'
+              })
+              this.addMatchVisible = false
+            }
+            console.log(res.data)
           })
-          this.addMatchVisible = false
+
         },
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
@@ -194,8 +230,29 @@
           });
         },
         lookDetail: function (row) {
+          console.log('details:', row)
+          this.imgs = row.picture
           this.dialogVisibleTwo = true
-        }
+        },
+        handleRemove(file, fileList) {
+          console.log(file, fileList)
+        },
+        beforeRemove(file, fileList) {
+          console.log(file, fileList)
+        },
+        handlePreview(file) {
+          console.log(file)
+        },
+        uploadPic: function(params) {
+          const formData = new FormData()
+          formData.append('file', params.file)
+          uploadPicture(formData).then(response => {
+            console.log('测试图片上传')
+            console.log(response)
+            this.picUrl.push(response.data.data.fileUrl)
+            console.log('picture:', this.picUrl)
+          })
+        },
       }
     }
 </script>

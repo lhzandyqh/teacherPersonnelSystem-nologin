@@ -1,0 +1,135 @@
+<template>
+    <div class="app-container">
+      <div class="content">
+        <div id="per_one" style="width:100%;height: 400px" />
+      </div>
+    </div>
+</template>
+
+<script>
+  import echarts from 'echarts'
+  require('echarts/theme/macarons') // echarts theme
+    export default {
+      name: "departmentChartOne",
+      data() {
+        return {
+          option: {
+            title: {
+              text: '教师能力指标雷达图',
+              top: '20',
+              left: 'center',
+              textStyle: {
+                fontSize: '15'
+              }
+            },
+            legend: {
+              data: ['标准值','当前值'],
+              y:'bottom'
+            },
+            radar: [
+              {
+                indicator: [
+                  { text: '教学与专业' },
+                  { text: '学生管理' },
+                  { text: '科研与社会服务' },
+                  { text: '个人发展' }
+                ],
+                center: ['50%', '50%'],
+                radius: 120,
+                startAngle: 90,
+                splitNumber: 4,
+                shape: 'circle',
+                name: {
+                  formatter: '【{value}】',
+                  textStyle: {
+                    color: '#72ACD1'
+                  }
+                },
+                splitArea: {
+                  areaStyle: {
+                    color: ['rgba(114, 172, 209, 0.2)',
+                      'rgba(114, 172, 209, 0.4)', 'rgba(114, 172, 209, 0.6)',
+                      'rgba(114, 172, 209, 0.8)', 'rgba(114, 172, 209, 1)'],
+                    shadowColor: 'rgba(0, 0, 0, 0.3)',
+                    shadowBlur: 10
+                  }
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: 'rgba(255, 255, 255, 0.5)'
+                  }
+                },
+                splitLine: {
+                  lineStyle: {
+                    color: 'rgba(255, 255, 255, 0.5)'
+                  }
+                }
+              }
+            ],
+            series: [
+              {
+                name: '雷达图',
+                type: 'radar',
+                emphasis: {
+                  lineStyle: {
+                    width: 4
+                  }
+                },
+                data: [
+                  {
+                    value: [84, 62, 73, 80],
+                    name: '标准值',
+                    symbol: 'rect',
+                    symbolSize: 5,
+                    lineStyle: {
+                      type: 'dashed'
+                    }
+                  },
+                  {
+                    value: [90, 52, 43, 53],
+                    name: '当前值',
+                    areaStyle: {
+                      color: 'rgba(255, 255, 255, 0.5)'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      mounted() {
+        this.initChart()
+        this.chartRes()
+      },
+      methods: {
+        initChart: function() {
+          this.chart = echarts.init(document.getElementById('per_one'), 'macarons')
+          this.chart.setOption(this.option)
+          // window.addEventListener("resize",function (){
+          //   this.chart.resize;
+          // });
+        },
+        chartRes() {
+          let _this = this;
+          window.addEventListener('resize', function () {
+            let w = document.getElementById("per_one").offsetWidth
+            let h = document.getElementById("per_one").offsetHeight
+            let resize = {
+              width: w,
+              height: h
+            }
+            // _this.myChart1.resize();
+            setTimeout(() => {
+              _this.chart.resize(resize);
+            },100)
+            console.log('111')
+          })
+        },
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

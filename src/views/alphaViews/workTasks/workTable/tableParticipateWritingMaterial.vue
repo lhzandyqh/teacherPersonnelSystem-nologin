@@ -136,8 +136,8 @@ import {addbook,getbook} from '@/api/join'
           this.addMatchVisible = true;
         },
         submitMatchSuccess(){
-          //this.form.usrName = 'rmyzAdmin'
-           this.form.usrName = '101'
+          this.form.usrName = 'rmyzAdmin'
+           // this.form.usrName = '101'
           console.log("Form123", this.form)
           addbook(this.form).then(res => {
             if(res.data.code === 0) {

@@ -34,7 +34,7 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="medium" @click="changematch(scope.row)">修改</el-button>
-          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
+          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework" disabled="true">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

@@ -28,7 +28,7 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="medium" @click="lookDetail(scope.row)">查看详情</el-button>
-          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
+          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" disabled="true" @click="deletework">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -125,7 +125,7 @@ import { teaInstructClubAwardInfosGetByUsername, teaInstructClubInfoAwardInfoSet
           fileList: [],
           imgs: [],
           currentPage: 1, // 当前页码
-          pageSize: 1 // 每页的数据条数
+          pageSize: 10 // 每页的数据条数
         }
       },
       mounted() {
@@ -169,10 +169,10 @@ import { teaInstructClubAwardInfosGetByUsername, teaInstructClubInfoAwardInfoSet
           this.addMatchVisible = true;
         },
         submitMatchSuccess(){
-          
+
           this.form.tecUsername = 'rmyzAdmin'
           this.form.picture = this.picUrl.join()
-          
+
            console.log("Form", this.form)
           teaInstructClubInfoAwardInfoSet(this.form).then(res => {
             if(res.data.code === 0) {
@@ -190,7 +190,7 @@ import { teaInstructClubAwardInfosGetByUsername, teaInstructClubInfoAwardInfoSet
           // })
           // this.addMatchVisible = false
         },
-        
+
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
             confirmButtonText: '确定',

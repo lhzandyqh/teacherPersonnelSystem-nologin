@@ -1,0 +1,82 @@
+<template>
+    <div class="app-container">
+      <div class="content">
+        <div id="bing_Five" style="width:100%;height: 400px" />
+      </div>
+    </div>
+</template>
+
+<script>
+  import echarts from 'echarts'
+  require('echarts/theme/macarons') // echarts theme
+    export default {
+      name: "departmentChartThree",
+      data() {
+        return {
+          option: {
+            title: {
+              text: '属性结构',
+              top: '20',
+              left: 'center',
+              textStyle: {
+                fontSize: '15'
+              }
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              left: 'center',
+              top: 'bottom',
+              data: ['专任', '兼职', '兼课']
+            },
+            toolbox: {
+              show: true,
+              feature: {
+                mark: {show: true},
+                dataView: {show: true, readOnly: false},
+                magicType: {
+                  show: true,
+                  type: ['pie', 'funnel']
+                },
+                restore: {show: true},
+                saveAsImage: {show: true}
+              }
+            },
+            series: [
+              {
+                name: '面积模式',
+                type: 'pie',
+                radius: [30, 110],
+                center: ['50%', '50%'],
+                roseType: 'area',
+                data: [
+                  {value: 143, name: '专任'},
+                  {value: 24, name: '兼职'},
+                  {value: 43, name: '兼课'}
+                ]
+              }
+            ]
+          }
+        }
+      },
+      mounted() {
+        this.initChart()
+      },
+      methods: {
+        initChart: function() {
+          this.chart = echarts.init(document.getElementById('bing_Five'), 'macarons')
+          this.chart.setOption(this.option)
+          // window.addEventListener("resize",function (){
+          //   this.chart.resize;
+          // });
+        },
+
+      }
+    }
+</script>
+
+<style scoped>
+
+</style>

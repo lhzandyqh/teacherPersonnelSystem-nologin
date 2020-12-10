@@ -2,80 +2,83 @@
   <div class="app-container">
     <div v-if="roles==='教师'">
       <el-card class="box-card">
-        <el-row>
-          <jiaoshi-chart-one />
-        </el-row>
-        <el-row>
-          <jiaoshi-chart-two />
-        </el-row>
+<!--        <el-row>-->
+<!--          <jiaoshi-chart-one />-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <jiaoshi-chart-two />-->
+<!--        </el-row>-->
+        <teacher-analysis></teacher-analysis>
       </el-card>
     </div>
     <div v-if="roles==='人事处主管'">
       <el-card class="box-card">
-        <div slot="header" class="clearfix">
-          <!--          <span>卡片名称</span>-->
-          <div class="main_container juli">
-            <div class="item_content">
-              <div class="item zi_border">
-                <span>校教职工总人数（人）</span>
-                <div class="shuzi">343</div>
-              </div>
-              <div class="item lan_border">
-                <span>新入教职工人人数(人)</span>
-                <div class="shuzi">6</div>
-              </div>
-              <div class="item hong_border">
-                <span>年度离职教职工人数(人)</span>
-                <div class="shuzi">2</div>
-              </div>
-              <div class="item lv_border">
-                <span>年度退休教职工人数（人）</span>
-                <div class="shuzi">12</div>
-              </div>
-            </div>
-            <div />
-          </div>
-        </div>
-        <el-row>
-          <renshi-chart-two />
-        </el-row>
-        <el-row>
-          <renshi-chart-one />
-        </el-row>
+        <personnel-analysis></personnel-analysis>
+<!--        <div slot="header" class="clearfix">-->
+<!--          &lt;!&ndash;          <span>卡片名称</span>&ndash;&gt;-->
+<!--          <div class="main_container juli">-->
+<!--            <div class="item_content">-->
+<!--              <div class="item zi_border">-->
+<!--                <span>校教职工总人数（人）</span>-->
+<!--                <div class="shuzi">343</div>-->
+<!--              </div>-->
+<!--              <div class="item lan_border">-->
+<!--                <span>新入教职工人人数(人)</span>-->
+<!--                <div class="shuzi">6</div>-->
+<!--              </div>-->
+<!--              <div class="item hong_border">-->
+<!--                <span>年度离职教职工人数(人)</span>-->
+<!--                <div class="shuzi">2</div>-->
+<!--              </div>-->
+<!--              <div class="item lv_border">-->
+<!--                <span>年度退休教职工人数（人）</span>-->
+<!--                <div class="shuzi">12</div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div />-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <el-row>-->
+<!--          <renshi-chart-two />-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <renshi-chart-one />-->
+<!--        </el-row>-->
       </el-card>
     </div>
     <div v-if="roles==='系部主管'">
       <el-card class="box-card">
-        <div slot="header" class="clearfix">
-          <!--          <span>卡片名称</span>-->
-          <div class="main_container juli">
-            <div class="item_content">
-              <div class="item zi_border">
-                <span>学院教职工总人数(人)</span>
-                <div class="shuzi">37</div>
-              </div>
-              <div class="item lan_border">
-                <span>年度绩效均分(分)</span>
-                <div class="shuzi">86</div>
-              </div>
-              <div class="item hong_border">
-                <span>新入教职工人人数(人)</span>
-                <div class="shuzi">67</div>
-              </div>
-              <div class="item lv_border">
-                <span>年度退休教职工人数（人）</span>
-                <div class="shuzi">3</div>
-              </div>
-            </div>
-            <div />
-          </div>
-        </div>
-        <el-row>
-          <xibu-chart-one />
-        </el-row>
-        <el-row>
-          <xibu-chart-two />
-        </el-row>
+<!--        <div slot="header" class="clearfix">-->
+<!--          &lt;!&ndash;          <span>卡片名称</span>&ndash;&gt;-->
+<!--          <div class="main_container juli">-->
+<!--            <div class="item_content">-->
+<!--              <div class="item zi_border">-->
+<!--                <span>学院教职工总人数(人)</span>-->
+<!--                <div class="shuzi">37</div>-->
+<!--              </div>-->
+<!--              <div class="item lan_border">-->
+<!--                <span>年度绩效均分(分)</span>-->
+<!--                <div class="shuzi">86</div>-->
+<!--              </div>-->
+<!--              <div class="item hong_border">-->
+<!--                <span>新入教职工人人数(人)</span>-->
+<!--                <div class="shuzi">67</div>-->
+<!--              </div>-->
+<!--              <div class="item lv_border">-->
+<!--                <span>年度退休教职工人数（人）</span>-->
+<!--                <div class="shuzi">3</div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div />-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <el-row>-->
+<!--          <xibu-chart-one />-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <xibu-chart-two />-->
+<!--        </el-row>-->
+        <department-analysis></department-analysis>
       </el-card>
     </div>
   </div>
@@ -88,6 +91,9 @@ import xibuChartOne from '@/views/alphaViews/homepage/echarts/xibuChartOne'
 import xibuChartTwo from '@/views/alphaViews/homepage/echarts/xibuChartTwo'
 import jiaoshiChartOne from '@/views/alphaViews/homepage/echarts/jiaoshiChartOne'
 import jiaoshiChartTwo from '@/views/alphaViews/homepage/echarts/jiaoshiChartTwo'
+import teacherAnalysis from '@/views/alphaViews/intelligentAnalysis/teacher'
+import departmentAnalysis from '@/views/alphaViews/intelligentAnalysis/department'
+import personnelAnalysis from '@/views/alphaViews/intelligentAnalysis/personnel'
 export default {
   name: 'Index',
   components: {
@@ -96,7 +102,10 @@ export default {
     xibuChartOne,
     xibuChartTwo,
     jiaoshiChartOne,
-    jiaoshiChartTwo
+    jiaoshiChartTwo,
+    teacherAnalysis,
+    departmentAnalysis,
+    personnelAnalysis
   },
   data() {
     return {

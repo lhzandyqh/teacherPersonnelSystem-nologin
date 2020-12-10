@@ -32,7 +32,7 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <!-- <el-button type="text" size="medium" @click="changematch(scope.row)">修改</el-button> -->
-          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework" disabled>删除</el-button>
+          <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework" disabled="true" >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -95,7 +95,7 @@ import { teaAssistStuInfosGetByTecUsername, teaAssistStuInfoSet } from '@/api/te
           detail:{},
           matchData: [],
           currentPage: 1, // 当前页码
-          pageSize: 1 // 每页的数据条数
+          pageSize: 10 // 每页的数据条数
         }
       },
       mounted() {
@@ -158,7 +158,7 @@ import { teaAssistStuInfosGetByTecUsername, teaAssistStuInfoSet } from '@/api/te
           // })
           // this.addMatchVisible = false
         },
-        
+
         deletework() {
           this.$confirm('确认删除此条信息?', '提示', {
             confirmButtonText: '确定',
