@@ -8,6 +8,7 @@
 
 <script>
   import echarts from 'echarts'
+  import { getXueyuanEchartsData } from '@/api/allChangeAnalysis'
   require('echarts/theme/macarons') // echarts theme
     export default {
       name: "departmentChartThree",
@@ -29,7 +30,8 @@
             legend: {
               orient: 'vertical',
               left: 'left',
-              data: ['河北医科大学', '河北大学', '唐山师范学院', '承德医学院', '河北科技大学','其他']
+              // data: ['河北医科大学', '河北大学', '唐山师范学院', '承德医学院', '河北科技大学','其他']
+              data: []
             },
             series: [
               {
@@ -38,12 +40,12 @@
                 radius: '55%',
                 center: ['50%', '60%'],
                 data: [
-                  {value: 76, name: '河北医科大学'},
-                  {value: 34, name: '河北大学'},
-                  {value: 63, name: '唐山师范学院'},
-                  {value: 45, name: '承德医学院'},
-                  {value: 12, name: '河北科技大学'},
-                  {value: 23, name: '其他'}
+                  // {value: 76, name: '河北医科大学'},
+                  // {value: 34, name: '河北大学'},
+                  // {value: 63, name: '唐山师范学院'},
+                  // {value: 45, name: '承德医学院'},
+                  // {value: 12, name: '河北科技大学'},
+                  // {value: 23, name: '其他'}
                 ],
                 emphasis: {
                   itemStyle: {
@@ -58,9 +60,35 @@
         }
       },
       mounted() {
-        this.initChart()
+        this.getEchartData()
+        setTimeout(()=>{
+          this.initChart()
+        },500)
       },
       methods: {
+        getEchartData: function(){
+          const prams = {
+            tecUsername: 'rmyzAdmin',
+            // tecUsername: localStorage.getItem('jwt')
+            authority: '系部主管'
+          }
+          getXueyuanEchartsData(prams).then(response =>{
+            console.log('系部主管测试学缘结构数据')
+            console.log(response.data.data)
+            for(let i in response.data.data){
+              // console.log(i)
+              this.option.legend.data.push(response.data.data[i].college)
+              const obj = {}
+              obj.value = response.data.data[i].nums
+              obj.name  = response.data.data[i].college
+              this.option.series[0].data.push(obj)
+            }
+            console.log('测试legend')
+            console.log(this.option.legend)
+            console.log('测试seriesdata')
+            console.log(this.option.series[0].data)
+          })
+        },
         initChart: function() {
           this.chart = echarts.init(document.getElementById('bing_Six'), 'macarons')
           this.chart.setOption(this.option)

@@ -17,9 +17,9 @@
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.checkStatus==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.checkStatus==='审核待通过'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.checkStatus==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核不通过'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核中'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核通过'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -38,8 +38,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="1"
-        :page-size="10"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[5, 10]"
         :total="matchData.length"
         layout="total, sizes, prev, pager, next, jumper"
@@ -95,7 +95,9 @@ import {addbook,getbook} from '@/api/join'
           title:'',
           form:{},
           detail:{},
-          matchData: []
+          matchData: [],
+          currentPage: 1, // 当前页码
+          pageSize: 5 // 每页的数据条数
         }
       },
       mounted() {
@@ -104,9 +106,12 @@ import {addbook,getbook} from '@/api/join'
       methods: {
         handleSizeChange(val) {
           console.log(`每页 ${val} 条`);
+          this.currentPage = 1;
+          this.pageSize = val;
         },
         handleCurrentChange(val) {
           console.log(`当前页: ${val}`);
+          this.currentPage = val;
         },
         reset(){
           this.form = {
@@ -137,7 +142,8 @@ import {addbook,getbook} from '@/api/join'
         },
         submitMatchSuccess(){
           //this.form.usrName = 'rmyzAdmin'
-           this.form.usrName = '101'
+          //  this.form.usrName = 'rmyzAdmin'
+          this.form.usrName = localStorage.getItem('jwt')
           console.log("Form123", this.form)
           addbook(this.form).then(res => {
             if(res.data.code === 0) {
@@ -169,7 +175,8 @@ import {addbook,getbook} from '@/api/join'
           });
         },
         getList() {
-          var username = 'rmyzAdmin'
+          // var username = 'rmyzAdmin'
+          var username = localStorage.getItem('jwt')
           //var username = '10011'
           getbook({
             usrname:username

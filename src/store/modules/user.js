@@ -46,12 +46,14 @@ const user = {
   actions: {
     // 用户名登录
     LoginByUsername({ commit }, userInfo) {
-      const username = userInfo.userName.trim()
+      const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         const prams = {
-          userName: username,
+          username: username,
           role: userInfo.role
         }
+        console.log('测试输出prams')
+        console.log(prams)
         loginByUsername(prams).then(response => {
           const data = response.data
           console.log('登陆测试登陆返回的数据')

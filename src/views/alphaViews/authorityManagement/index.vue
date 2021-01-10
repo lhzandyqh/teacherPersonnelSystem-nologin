@@ -5,50 +5,58 @@
         <div style="display: flex;align-items: center;margin: 15px 0;">
           <div style="font-size: 14px;margin: 0 15px;font-weight: bolder">请选择组织:</div>
           <div>
-            <el-select v-model="valuea" placeholder="请选择组织">
-              <el-option
-                v-for="item in optionstwo"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                :disabled="item.disabled"
-              />
-            </el-select>
+<!--            <el-select v-model="valuea" placeholder="请选择组织">-->
+<!--              <el-option-->
+<!--                v-for="item in optionstwo"-->
+<!--                :key="item.value"-->
+<!--                :label="item.label"-->
+<!--                :value="item.value"-->
+<!--                :disabled="item.disabled"-->
+<!--              />-->
+<!--            </el-select>-->
+            <el-cascader
+              v-model="value"
+              :options="options"
+              :props="defaultProps"
+              @change="handleChange"></el-cascader>
           </div>
           <div style="font-size: 14px;margin-right: 15px;font-weight: bolder;margin-left: 15px">请输入姓名:</div>
           <div>
             <el-input v-model="input" placeholder="请输入姓名" />
           </div>
           <div>
-            <el-button type="primary" style="margin-left:15px">查询</el-button>
+            <el-button type="primary" style="margin-left:15px" @click="findByCondition">查询</el-button>
+          </div>
+          <div>
+            <el-button type="primary" style="margin-left:15px" @click="getAllUser">查询所有</el-button>
           </div>
         </div>
       </el-row>
       <el-divider />
       <el-row>
-        <el-table :data="list.slice((currentPage-1)*pagesize,currentPage*pagesize)" style="width: 100%">
+        <el-table :data="tablaData.slice((currentPage-1)*pagesize,currentPage*pagesize)" style="width: 100%">
 
-          <el-table-column align="center" label="序号">
-            <template slot-scope="scope">
-              <span>{{ scope.row.userid }}</span>
-            </template>
-          </el-table-column>
+<!--          <el-table-column align="center" label="序号">-->
+<!--            <template slot-scope="scope">-->
+<!--              <span>{{ scope.row.userid }}</span>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
           <el-table-column align="center" label="编号">
             <template slot-scope="scope">
-              <span>{{ scope.row.id }}</span>
+              <span>{{ scope.row.usrName }}</span>
             </template>
           </el-table-column>
 
           <el-table-column align="center" label="姓名">
             <template slot-scope="scope">
-              <span>{{ scope.row.personnel_name }}</span>
+              <span>{{ scope.row.teaName }}</span>
             </template>
           </el-table-column>
 
           <el-table-column align="center" label="性别">
             <template slot-scope="scope">
-              <span>{{ scope.row.gender }}</span>
+              <span>{{ scope.row.sex }}</span>
             </template>
           </el-table-column>
 
@@ -60,17 +68,17 @@
 
           <el-table-column align="center" label="部门">
             <template slot-scope="scope">
-              <span>{{ scope.row.post }}</span>
+              <span>{{ scope.row.dept }}</span>
             </template>
           </el-table-column>
 
           <el-table-column align="center" label="职务">
             <template slot-scope="scope">
-              <span>{{ scope.row.position_level }}</span>
+              <span>{{ scope.row.position }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column align="center" label="权限展示">
+          <el-table-column align="center" label="可用权限">
             <!--          <template slot-scope="scope">-->
             <!--            <el-select v-model="scope.row.userrole" placeholder="权限" @change="eidtAuthority(scope.row.userid, scope.row.userrole)">-->
             <!--              <el-option label="教师" value="教师"/>-->
@@ -79,7 +87,7 @@
             <!--            </el-select>-->
             <!--          </template>-->
             <template slot-scope="scope">
-              <div v-for="(item,i) in scope.row.userrole" :key="i">
+              <div v-for="(item,i) in scope.row.teaRole" :key="i">
                 <span>{{ item }}</span>
               </div>
             </template>
@@ -99,16 +107,16 @@
                 <el-option label="系部主管" value="系部主管" />
                 <el-option label="人事处主管" value="人事处主管" />
               </el-select>
-              <el-button type="primary" style="margin-top: 10px" @click="editRoles(scope.row.userid, scope.row.edit)">确认修改</el-button>
+              <el-button type="primary" style="margin-top: 10px" @click="editRole(scope.row)">确认修改</el-button>
             </template>
           </el-table-column>
         </el-table>
         <div class="fenye">
           <el-pagination
             :current-page="currentPage"
-            :page-sizes="[10, 20, 30]"
-            :page-size="10"
-            :total="list.length"
+            :page-sizes="[5, 10, 20, 30]"
+            :page-size="pagesize"
+            :total="tablaData.length"
             style="margin-top:20px;"
             layout="total, sizes, prev, pager, next, jumper"
             @size-change="handleSizeChange"
@@ -122,6 +130,7 @@
 
 <script>
 
+import { perGetAllOrg, perGetAllAuthorityUser, perEditUserAuthority,perGetUserByCondition } from '@/api/authorityManagement'
 export default {
   name: 'Index',
   filters: {
@@ -136,7 +145,7 @@ export default {
   },
   data() {
     return {
-      pagesize: 10,
+      pagesize: 5,
       currentPage: 1,
       value1: [],
       input: '',
@@ -192,12 +201,44 @@ export default {
         limit: 10
       },
       dialogPvVisible: false,
-      thisId: ''
+      thisId: '',
+      tablaData: [],
+      options: [],
+      condition: [],
+      defaultProps: {
+        children: 'children',
+        label: 'orgName',
+        value: 'orgName'
+      }
     }
   },
   created() {
   },
+  mounted() {
+    this.getAllUser()
+    this.getAllOrg()
+  },
   methods: {
+    getAllUser: function (){
+      const prams = {
+        dept: '',
+        teaName: ''
+      }
+      perGetAllAuthorityUser(prams).then(response => {
+        console.log('权限管理获取所有的用户')
+        console.log(response.data)
+        this.tablaData = response.data.data
+      })
+      this.value = ''
+      this.input = ''
+    },
+    getAllOrg: function (){
+      perGetAllOrg().then(response => {
+        console.log('测试获取所有的组织')
+        console.log(response.data)
+        this.options = response.data.data.children
+      })
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
       this.pagesize = val
@@ -205,6 +246,45 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`)
       this.currentPage = val
+    },
+    editRole: function (row){
+      var roleString  = ''
+      for(let i = 0;i<row.edit.length;i++){
+        roleString = roleString+row.edit[i]+','
+      }
+      const prams = {
+        id: row.id,
+        roleList: roleString
+      }
+      console.log('测试权限设置传递参数')
+      console.log(prams)
+      perEditUserAuthority(prams).then(response => {
+        console.log('测试设置用户权限')
+        console.log(response.data)
+        this.getAllUser()
+        this.$message({
+          message: '设置成功',
+          type: 'success'
+        });
+      })
+    },
+    handleChange(value) {
+      console.log(value);
+      this.condition = value
+    },
+    findByCondition: function (){
+      const prams = {
+        dept: this.condition[this.condition.length-1],
+        teaName: this.input
+      }
+      console.log('测试prams')
+      console.log(prams)
+      perGetUserByCondition(prams).then(response =>{
+        console.log('测试根据条件寻找成员')
+        console.log(response.data)
+        this.tablaData = response.data.data
+        this.value = ''
+      })
     }
   }
 }

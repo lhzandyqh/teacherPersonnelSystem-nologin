@@ -303,6 +303,7 @@
     name: 'Login',
     components: { LangSelect },
     mounted() {
+      this.getJwt(),
       setTimeout(() => {
         this.handleLogin()
       }, 2000)
@@ -325,7 +326,7 @@
       return {
         checked: false,
         loginForm: {
-          userName: '10011',
+          username: '10001',//权限控制账号控制先返回教师权限
           role: ''
         },
         loginRules: {
@@ -353,6 +354,13 @@
       // window.removeEventListener('hashchange', this.afterQRScan)
     },
     methods: {
+      getJwt: function() {
+        var afterUrl = window.location.search.substring(1)
+        var afterEqual = afterUrl.substring(afterUrl.indexOf('=') + 1)
+        console.log('测试获取jwt')
+        console.log(afterEqual)
+        localStorage.setItem('jwt', afterEqual)
+      },
       showPwd() {
         if (this.passwordType === 'password') {
           this.passwordType = ''

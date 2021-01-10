@@ -17,9 +17,9 @@
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.checkStatus==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.checkStatus==='审核待通过'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.checkStatus==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核不通过'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核中'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核通过'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -97,7 +97,7 @@ import {addResearch,getResearch} from '@/api/join'
           detail:{},
           matchData: [],
           currentPage: 1, // 当前页码
-          pageSize: 1 // 每页的数据条数
+          pageSize: 5 // 每页的数据条数
         }
       },
       mounted() {
@@ -141,7 +141,8 @@ import {addResearch,getResearch} from '@/api/join'
           this.addMatchVisible = true;
         },
         submitMatchSuccess(){
-           this.form.usrName = '101'
+           // this.form.usrName = 'rmyzAdmin'
+          this.form.usrName = localStorage.getItem('jwt')
           // this.form.usrName = '10011'
           console.log("Form", this.form)
           addResearch(this.form).then(res => {
@@ -174,7 +175,8 @@ import {addResearch,getResearch} from '@/api/join'
           });
         },
         getList() {
-           var username = '101'
+           // var username = 'rmyzAdmin'
+          var username = localStorage.getItem('jwt')
           //var username = '10011'
           getResearch({
             usrname:username

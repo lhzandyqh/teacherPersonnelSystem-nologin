@@ -8,6 +8,7 @@
 
 <script>
   import echarts from 'echarts'
+  import { getXueliEchartsData } from '@/api/allChangeAnalysis'
   require('echarts/theme/macarons') // echarts theme
     export default {
       name: "departmentChartThree",
@@ -63,9 +64,27 @@
         }
       },
       mounted() {
-        this.initChart()
+        this.getEchartData()
+        setTimeout(()=>{
+          this.initChart()
+        },500)
       },
       methods: {
+        getEchartData: function() {
+          const prams = {
+            tecUsername: 'rmyzAdmin',
+            // tecUsername: localStorage.getItem('jwt')
+            authority: '人事处主管'
+          }
+          getXueliEchartsData(prams).then(response => {
+            console.log('人事处主管测试学历结构分布')
+            console.log(response.data.data)
+            this.option.series[0].data[0].value = response.data.data[0].nums
+            this.option.series[0].data[1].value = response.data.data[1].nums
+            this.option.series[0].data[2].value = response.data.data[2].nums
+            this.option.series[0].data[3].value = response.data.data[3].nums
+          })
+        },
         initChart: function() {
           this.chart = echarts.init(document.getElementById('per_bing_Two'), 'macarons')
           this.chart.setOption(this.option)

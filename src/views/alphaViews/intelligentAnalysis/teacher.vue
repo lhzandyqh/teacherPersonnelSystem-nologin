@@ -64,24 +64,25 @@
         <div class="echart_con" style="width: 100%">
           <div class="echart_one" style="width: 30%;float: left" >
             <div class="content" style="width: 100%" >
-              <div id="leida" style="width:100%;height: 400px" />
+              <div id="leida" style="width:100%;height: 450px" />
             </div>
           </div>
           <div class="echart_Two" style="width: 70%;float: left" >
             <div class="content">
-              <div id="gongzuo" style="width:100%;height: 400px" />
+              <div id="gongzuo" style="width:100%;height: 450px" />
             </div>
           </div>
         </div>
-        <div class="juli">
-          ddd
-        </div>
+<!--        <div class="juli">-->
+<!--          ddd-->
+<!--        </div>-->
       </div>
     </div>
 </template>
 
 <script>
   import echarts from 'echarts'
+  import { geTeacherWorkStatistic } from '@/api/allChangeAnalysis'
   require('echarts/theme/macarons') // echarts theme
     export default {
       name: "teacher",
@@ -185,8 +186,8 @@
             },
             legend: {
               orient: 'vertical',
-              x: 'left',
-              data: ['基本工作', '完成教学工作情况', '完成教育工作情况', '汇报课、观摩课、研究课情况', '组织课外活动情况', '参加系统进修或继续教育情况', '指导、 培养教师情况', '绩效工作', '学术成果', '项目课题', '学术经验与讲座', '教育教学评比竞赛', '研究课', '教育教学成果', '教师指导学生参加学科竞赛获奖情况', '艺科体社团']
+              x: 'right',
+              data: ['教学与专业发展','指导学生实训情况','指导学生毕业设计','教育教学获奖情况','参与建设情况','参与教研项目情况','参与编写教材情况','科研与社会服务','参与课题情况','学术成果情况','科研成果获奖情况','社会培训情况','社会实践（兼职）情况','学生管理工作','承担辅导员工作','指导社团获奖情况','帮扶学生情况']
             },
             series: [
               {
@@ -206,8 +207,9 @@
                   }
                 },
                 data: [
-                  { value: 835, name: '基本工作', selected: true },
-                  { value: 1948, name: '绩效工作' }
+                  { value: 835, name: '教学与专业发展', selected: true },
+                  { value: 1948, name: '科研与社会服务' },
+                  { value: 1948, name: '学生管理工作' }
                 ]
               },
               {
@@ -259,20 +261,20 @@
                   }
                 },
                 data: [
-                  { value: 335, name: '完成教学工作情况' },
-                  { value: 100, name: '完成教育工作情况' },
-                  { value: 100, name: '汇报课、观摩课、研究课情况' },
-                  { value: 100, name: '组织课外活动情况' },
-                  { value: 100, name: '参加系统进修或继续教育情况' },
-                  { value: 100, name: '指导、 培养教师情况' },
-                  { value: 1048, name: '学术成果' },
-                  { value: 251, name: '项目课题' },
-                  { value: 147, name: '学术经验与讲座' },
-                  { value: 102, name: '教育教学评比竞赛' },
-                  { value: 100, name: '研究课' },
-                  { value: 100, name: '教育教学成果' },
-                  { value: 100, name: '教师指导学生参加学科竞赛获奖情况' },
-                  { value: 100, name: '艺科体社团' }
+                  { value: 335, name: '指导学生实训情况' },
+                  { value: 100, name: '指导学生毕业设计' },
+                  { value: 100, name: '教育教学获奖情况' },
+                  { value: 100, name: '参与建设情况' },
+                  { value: 100, name: '参与教研项目情况' },
+                  { value: 100, name: '参与编写教材情况' },
+                  { value: 1048, name: '参与课题情况' },
+                  { value: 251, name: '学术成果情况' },
+                  { value: 147, name: '科研成果获奖情况' },
+                  { value: 102, name: '社会培训情况' },
+                  { value: 100, name: '社会实践（兼职）情况' },
+                  { value: 100, name: '承担辅导员工作' },
+                  { value: 100, name: '指导社团获奖情况' },
+                  { value: 100, name: '帮扶学生情况' }
                 ]
               }
             ]
@@ -280,10 +282,42 @@
         }
       },
       mounted() {
+        this.getEchartData()
         this.initChart()
-        this.initChartTwo()
+        // this.initChartTwo()
+        setTimeout(()=>{
+          this.initChartTwo()
+        },500)
       },
       methods: {
+        getEchartData: function() {
+          const prams = {
+            // tecUsername: 'rmyzAdmin',
+            tecUsername: localStorage.getItem('jwt'),
+            authority: '教师'
+          }
+          geTeacherWorkStatistic(prams).then(response=> {
+            console.log('获取教师权限获取图的数据')
+            console.log(response.data.data)
+            this.optionTwo.series[0].data[0].value = response.data.data.teachAndMajorDevJsonObject.teachAndMajorDevTotalNums
+            this.optionTwo.series[0].data[1].value = response.data.data.sciAndSocialServiceJsonObject.sciAndSocialServiceTotalNums
+            this.optionTwo.series[0].data[2].value = response.data.data.stuManageWork.stuManageWorkTotalNums
+            this.optionTwo.series[1].data[0].value = response.data.data.teachAndMajorDevJsonObject.teaInstructStuTrainingInfoNums
+            this.optionTwo.series[1].data[1].value = response.data.data.teachAndMajorDevJsonObject.teaInstructStuGradInfoNums
+            this.optionTwo.series[1].data[2].value = response.data.data.teachAndMajorDevJsonObject.teaEduAwardInfoNums
+            this.optionTwo.series[1].data[3].value = response.data.data.teachAndMajorDevJsonObject.teaParticiConstructInfoNums
+            this.optionTwo.series[1].data[4].value = response.data.data.teachAndMajorDevJsonObject.teaParticiTeachResearchInfoNums
+            this.optionTwo.series[1].data[5].value = response.data.data.teachAndMajorDevJsonObject.teaParticiCompileTextbookInfoNums
+            this.optionTwo.series[1].data[6].value = response.data.data.sciAndSocialServiceJsonObject.teaParticiResearchPrjInfoNums
+            this.optionTwo.series[1].data[7].value = response.data.data.sciAndSocialServiceJsonObject.teaPaperInfoNums
+            this.optionTwo.series[1].data[8].value = response.data.data.sciAndSocialServiceJsonObject.teaSciAchieveInfoNums
+            this.optionTwo.series[1].data[9].value = response.data.data.sciAndSocialServiceJsonObject.teaSocialTrainInfoNums
+            this.optionTwo.series[1].data[10].value = response.data.data.sciAndSocialServiceJsonObject.teaSocialPracticeInfoNums
+            this.optionTwo.series[1].data[11].value = response.data.data.stuManageWork.teaBeCounselorInfoNums
+            this.optionTwo.series[1].data[12].value = response.data.data.stuManageWork.teaInstructClubNums
+            this.optionTwo.series[1].data[13].value = response.data.data.stuManageWork.teaAssistStuNums
+          })
+        },
         initChart: function() {
           this.chart = echarts.init(document.getElementById('leida'), 'macarons')
           this.chart.setOption(this.option)

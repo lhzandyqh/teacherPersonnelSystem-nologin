@@ -74,7 +74,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/alphaViews/homepage/index'),
         name: 'Dashboard',
-        meta: { title: '智能分析', icon: 'dashboard', noCache: true, affix: true }
+        meta: { title: '诊改分析', icon: 'dashboard', noCache: true, affix: true }
       }
     ]
   }
@@ -208,18 +208,18 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/appointmentmanagement',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/alphaViews/appointmentManagement/index'),
-        name: 'appointmentmanagement',
-        meta: { title: '聘任管理', roles: ['人事处主管'], icon: 'component', noCache: true }
-      }
-    ]
-  },
+  // {
+  //   path: '/appointmentmanagement',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/alphaViews/appointmentManagement/index'),
+  //       name: 'appointmentmanagement',
+  //       meta: { title: '聘任管理', roles: ['人事处主管'], icon: 'component', noCache: true }
+  //     }
+  //   ]
+  // },
   {
     path: '/contractmanagement',
     component: Layout,
@@ -264,7 +264,19 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/alphaViews/specialApproval/index'),
         name: 'specialapproval',
-        meta: { title: '专项审批', roles: ['系部主管', '人事处主管'], icon: 'form', noCache: true }
+        meta: { title: '专项审批', roles: ['系部主管'], icon: 'form', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/specialapprovalpersonnel',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/alphaViews/specialApprovalPersonnel/index'),
+        name: 'specialapprovalpersonnel',
+        meta: { title: '专项审批', roles: ['人事处主管'], icon: 'form', noCache: true }
       }
     ]
   },

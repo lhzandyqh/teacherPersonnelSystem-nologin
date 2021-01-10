@@ -713,7 +713,7 @@
             stripe
           >
             <el-table-column
-              prop="name"
+              prop="submitPerson"
               label="姓名"
             />
             <el-table-column
@@ -739,7 +739,7 @@
             <el-table-column label="操作" align="center"  class-name="small-padding fixed-width">
               <template slot-scope="scope">
 <!--                <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>-->
-                <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" @click="deletework">删除</el-button>
+                <el-button  size="mini" type="text" icon="el-icon-delete" style="color: red" disabled="disabled" @click="deletework">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -1181,8 +1181,8 @@
               </div>
               <div class="content">
                 <el-select v-model="basicForm.teaSex" style="width: 185px" placeholder="请选择">
-                  <el-option label="男" value="1"/>
-                  <el-option label="女" value="0"/>
+                  <el-option label="男" value="男"/>
+                  <el-option label="女" value="女"/>
                 </el-select>
               </div>
             </div>
@@ -1663,7 +1663,7 @@ export default {
         teaQualifiedUnit: '',
         teachMajor: '',
         annualAssessment: '',
-        teaUsername: 'rmyzAdmin',
+        teaUsername: localStorage.getItem('jwt'),
         teaPhoto: ''
       },
       eduForm: {
@@ -1678,7 +1678,7 @@ export default {
         highestMajor: '',
         highestStudyDuration: '',
         initialStudyDuration: '',
-        tecUsername: 'rmyzAdmin'
+        tecUsername: localStorage.getItem('jwt'),
       },
       proForm: {
         professTechPosition: '',
@@ -1703,7 +1703,7 @@ export default {
         professCertGrantDate: '',
         professCertIssueDate: '',
         professCertIssueUnit: '',
-        tecUsername: 'rmyzAdmin'
+        tecUsername: localStorage.getItem('jwt'),
       }
     }
   },
@@ -1713,7 +1713,8 @@ export default {
   methods: {
     getAllData: function() {
       const parms = {
-        tecUsername: 'rmyzAdmin'
+        // tecUsername: 'rmyzAdmin'
+        tecUsername: localStorage.getItem('jwt'),
       }
       userGetPersonalInformation(parms).then(response => {
         console.log('测试登陆获取个人信息')
@@ -1749,7 +1750,8 @@ export default {
       console.log('submit!')
     },
     submit() {
-      this.form.teaUsername = 'rmyzAdmin'
+      // this.form.teaUsername = 'rmyzAdmin'
+      this.form.teaUsername = localStorage.getItem('jwt')
       console.log('测试form')
       console.log(this.form)
       addWorkInformation(this.form).then(response => {
@@ -1788,7 +1790,8 @@ export default {
       // this.basicDialogVisible = true
       var flag
       const prams = {
-        tecUsername: 'rmyzAdmin',
+        // tecUsername: 'rmyzAdmin',
+        tecUsername: localStorage.getItem('jwt'),
         teaInfoUpdateType: '基本信息修改'
       }
       ifHaveAuditData(prams).then(response => {
@@ -1797,6 +1800,35 @@ export default {
         flag = response.data.data.status
         if(flag === 'true'){
           this.basicDialogVisible = true
+          this.basicForm.teaName = this.allInfo.basicInfo.teaName
+          this.basicForm.teaSex = this.allInfo.basicInfo.teaSex
+          this.basicForm.nation = this.allInfo.basicInfo.nation
+          this.basicForm.birthDate = this.allInfo.basicInfo.birthDate
+          this.basicForm.age = this.allInfo.basicInfo.age
+          this.basicForm.nativePlace = this.allInfo.basicInfo.nativePlace
+          this.basicForm.residence = this.allInfo.basicInfo.residence
+          this.basicForm.currentAddress = this.allInfo.basicInfo.currentAddress
+          this.basicForm.teachQualityAssessment = this.allInfo.basicInfo.teachQualityAssessment
+          this.basicForm.cardId = this.allInfo.basicInfo.cardId
+          this.basicForm.politicStatus = this.allInfo.basicInfo.politicStatus
+          this.basicForm.politicDate = this.allInfo.basicInfo.politicDate
+          this.basicForm.phoneNum = this.allInfo.basicInfo.phoneNum
+          this.basicForm.email = this.allInfo.basicInfo.email
+          this.basicForm.workStartDate = this.allInfo.basicInfo.workStartDate
+          this.basicForm.comeToSchoolDate = this.allInfo.basicInfo.comeToSchoolDate
+          this.basicForm.workYears = this.allInfo.basicInfo.workYears
+          this.basicForm.dept = this.allInfo.basicInfo.dept
+          this.basicForm.teaId = this.allInfo.basicInfo.teaId
+          this.basicForm.position = this.allInfo.basicInfo.position
+          this.basicForm.positionDate = this.allInfo.basicInfo.positionDate
+          this.basicForm.hireType = this.allInfo.basicInfo.hireType
+          this.basicForm.workStatus = this.allInfo.basicInfo.workStatus
+          this.basicForm.contractStartDate = this.allInfo.basicInfo.contractStartDate
+          this.basicForm.contractEndDate = this.allInfo.basicInfo.contractEndDate
+          this.basicForm.teaQualifiedDate = this.allInfo.basicInfo.teaQualifiedDate
+          this.basicForm.teaQualifiedUnit = this.allInfo.basicInfo.teaQualifiedUnit
+          this.basicForm.teachMajor = this.allInfo.basicInfo.teachMajor
+          this.basicForm.annualAssessment = this.allInfo.basicInfo.annualAssessment
         }else {
           this.$message({
             message: '已提交修改申请，请审核完成后再提交',
@@ -1808,7 +1840,8 @@ export default {
     openDialog: function () {
       var flag
       const prams = {
-        tecUsername: 'rmyzAdmin',
+        // tecUsername: 'rmyzAdmin',
+        tecUsername: localStorage.getItem('jwt'),
         teaInfoUpdateType: '工作经历新增'
       }
       ifHaveAuditData(prams).then(response => {
@@ -1831,7 +1864,8 @@ export default {
     openZhuanyeDialog: function () {
       var flag
       const prams = {
-        tecUsername: 'rmyzAdmin',
+        // tecUsername: 'rmyzAdmin',
+        tecUsername: localStorage.getItem('jwt'),
         teaInfoUpdateType: '专业能力修改'
       }
       ifHaveAuditData(prams).then(response => {
@@ -1840,6 +1874,28 @@ export default {
         flag = response.data.data.status
         if(flag === 'true'){
           this.zhuanyeDialogVisible = true
+          this.proForm.professTechPosition = this.allInfo.professionalAbility.professTechPosition
+          this.proForm.professTechGrantDate = this.allInfo.professionalAbility.professTechGrantDate
+          this.proForm.professTechIssueDate = this.allInfo.professionalAbility.professTechIssueDate
+          this.proForm.professTechIssueUnit = this.allInfo.professionalAbility.professTechIssueUnit
+          this.proForm.qualificateCertName = this.allInfo.professionalAbility.qualificateCertName
+          this.proForm.qualificateCertGrantDate = this.allInfo.professionalAbility.qualificateCertGrantDate
+          this.proForm.qualificateCertIssueDate = this.allInfo.professionalAbility.qualificateCertIssueDate
+          this.proForm.qualificateCertIssueUnit = this.allInfo.professionalAbility.qualificateCertIssueUnit
+          this.proForm.positionTitle = this.allInfo.professionalAbility.positionTitle
+          this.proForm.positionGrantDate = this.allInfo.professionalAbility.positionGrantDate
+          this.proForm.positionObtainDate = this.allInfo.professionalAbility.positionObtainDate
+          this.proForm.ifCadreTeacher = this.allInfo.professionalAbility.ifCadreTeacher
+          this.proForm.cadreTeacherEngageDate = this.allInfo.professionalAbility.cadreTeacherEngageDate
+          this.proForm.ifDoubleTeacher = this.allInfo.professionalAbility.ifDoubleTeacher
+          this.proForm.doubleTeacherEngageDate = this.allInfo.professionalAbility.doubleTeacherEngageDate
+          this.proForm.majorSubjectLeader = this.allInfo.professionalAbility.majorSubjectLeader
+          this.proForm.majorSubjectLeaderDate = this.allInfo.professionalAbility.majorSubjectLeaderDate
+          this.proForm.professArea = this.allInfo.professionalAbility.professArea
+          this.proForm.professCertName = this.allInfo.professionalAbility.professCertName
+          this.proForm.professCertGrantDate = this.allInfo.professionalAbility.professCertGrantDate
+          this.proForm.professCertIssueDate = this.allInfo.professionalAbility.professCertIssueDate
+          this.proForm.professCertIssueUnit = this.allInfo.professionalAbility.professCertIssueUnit
         }else {
           this.$message({
             message: '已提交修改申请，请审核完成后再提交',
@@ -1858,7 +1914,8 @@ export default {
       // this.studyDialogVisible = true
       var flag
       const prams = {
-        tecUsername: 'rmyzAdmin',
+        // tecUsername: 'rmyzAdmin',
+        tecUsername: localStorage.getItem('jwt'),
         teaInfoUpdateType: '学历信息修改'
       }
       ifHaveAuditData(prams).then(response => {
@@ -1867,6 +1924,16 @@ export default {
         flag = response.data.data.status
         if(flag === 'true'){
           this.studyDialogVisible = true
+          this.eduForm.initialEducation = this.allInfo.educationInfo.initialEducation
+          this.eduForm.initialUniversity = this.allInfo.educationInfo.initialUniversity
+          this.eduForm.initialGraduateDate = this.allInfo.educationInfo.initialGraduateDate
+          this.eduForm.highestEducation = this.allInfo.educationInfo.highestEducation
+          this.eduForm.highestUniversity = this.allInfo.educationInfo.highestUniversity
+          this.eduForm.highestGraduateDate = this.allInfo.educationInfo.highestGraduateDate
+          this.eduForm.highestDegree = this.allInfo.educationInfo.highestDegree
+          this.eduForm.highestMajor = this.allInfo.educationInfo.highestMajor
+          this.eduForm.highestStudyDuration = this.allInfo.educationInfo.highestStudyDuration
+          this.eduForm.initialStudyDuration = this.allInfo.educationInfo.initialStudyDuration
         }else {
           this.$message({
             message: '已提交修改申请，请审核完成后再提交',

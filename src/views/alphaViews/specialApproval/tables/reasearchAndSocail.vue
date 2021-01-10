@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
     <el-table :data="peopleData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%">
-      <el-table-column prop="subdate" label="提交日期" />
-      <el-table-column prop="applypeople" label="提交人" />
-      <el-table-column prop="department" label="部门" />
-      <el-table-column prop="sub" label="类型" />
+      <el-table-column prop="insertDate" label="提交日期" />
+      <el-table-column prop="submitPerson" label="提交人" />
+      <el-table-column prop="dept" label="部门" />
+      <el-table-column prop="auditType" label="类型" />
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.approval==='通过'" type="success">审核通过</el-tag>
-          <el-tag v-if="scope.row.approval==='未通过'" type="danger">审核未通过</el-tag>
-          <el-tag v-if="scope.row.approval==='待通过'">审核待通过</el-tag>
+          <el-tag v-if="scope.row.auditStatus==='审核通过'" type="success">审核通过</el-tag>
+          <el-tag v-if="scope.row.auditStatus==='审核未通过'" type="danger">审核未通过</el-tag>
+          <el-tag v-if="scope.row.auditStatus==='待审核'">待审核</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -34,31 +34,31 @@
         :data="tableData"
         style="width: 100%">
         <el-table-column
-          prop="date"
+          prop="prjName"
           label="课题名称">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="prjType"
           label="课题类型">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="particiForm"
           label="参与形式">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="prjLevel"
           label="课题级别">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="prjFund"
           label="课题到款额">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="startDate"
           label="开始时间">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="endDate"
           label="结束时间">
         </el-table-column>
       </el-table>
@@ -69,7 +69,7 @@
         </el-row>
         <el-row style="padding-top: 10px">
           <el-input
-            v-model="AuditingReason"
+            v-model="ketiForm.auditDesc"
             :rows="4"
             type="textarea"
             placeholder="请输入内容"
@@ -79,46 +79,46 @@
       <div>
         <el-row style="padding-top: 10px">
           <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="radio" label="1">是</el-radio>
-          <el-radio v-model="radio" label="2">否</el-radio>
+          <el-radio style="margin-left: 20px" v-model="ketiForm.ifTwoLevelAudit" label="是">是</el-radio>
+          <el-radio v-model="ketiForm.ifTwoLevelAudit" label="否">否</el-radio>
         </el-row>
       </div>
       <div class="foot"style="text-align: center;margin-top: 30px">
-        <el-button type="success" size="small" plain @click="pass">审核通过</el-button>
-        <el-button type="danger" size="small" plain @click="pass">审核未通过</el-button>
+        <el-button type="success" size="small" plain @click="ketiAuditing('审核通过')">审核通过</el-button>
+        <el-button type="danger" size="small" plain @click="ketiAuditing('审核未通过')">审核未通过</el-button>
         <el-button type="primary" size="small" plain @click="VisibleOne = false">关闭</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="VisibleTwo" title="审核详情">
       <el-table
-        :data="tableData"
+        :data="tableDataTwo"
         style="width: 100%">
         <el-table-column
-          prop="date"
+          prop="paperName"
           label="学术成果名称">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="paperType"
           label="学术成果类型">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="pubDate"
           label="发表日期">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="ifFirstAuthor"
           label="是否第一作者">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="pubJournal"
           label="刊物名称">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="issn"
           label="刊号">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="journalLevel"
           label="刊物等级">
         </el-table-column>
       </el-table>
@@ -129,7 +129,7 @@
         </el-row>
         <el-row style="padding-top: 10px">
           <el-input
-            v-model="AuditingReason"
+            v-model="xueshuForm.auditDesc"
             :rows="4"
             type="textarea"
             placeholder="请输入内容"
@@ -139,34 +139,34 @@
       <div>
         <el-row style="padding-top: 10px">
           <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="radio" label="1">是</el-radio>
-          <el-radio v-model="radio" label="2">否</el-radio>
+          <el-radio style="margin-left: 20px" v-model="xueshuForm.ifTwoLevelAudit" label="是">是</el-radio>
+          <el-radio v-model="xueshuForm.ifTwoLevelAudit" label="否">否</el-radio>
         </el-row>
       </div>
       <div class="foot"style="text-align: center;margin-top: 30px">
-        <el-button type="success" size="small" plain @click="pass">审核通过</el-button>
-        <el-button type="danger" size="small" plain @click="pass">审核未通过</el-button>
+        <el-button type="success" size="small" plain @click="xueshuAuditing('审核通过')">审核通过</el-button>
+        <el-button type="danger" size="small" plain @click="xueshuAuditing('审核未通过')">审核未通过</el-button>
         <el-button type="primary" size="small" plain @click="VisibleTwo = false">关闭</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="VisibleThree" title="审核详情">
       <el-table
-        :data="tableData"
+        :data="tableDataThree"
         style="width: 100%">
         <el-table-column
-          prop="date"
+          prop="achieveName"
           label="科研成果名称">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="achieveType"
           label="科研成果类型">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="achieveLevel"
           label="科研成果级别">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="achieveDate"
           label="取得日期">
         </el-table-column>
       </el-table>
@@ -189,7 +189,7 @@
         </el-row>
         <el-row style="padding-top: 10px">
           <el-input
-            v-model="AuditingReason"
+            v-model="keyanForm.auditDesc"
             :rows="4"
             type="textarea"
             placeholder="请输入内容"
@@ -199,99 +199,125 @@
       <div>
         <el-row style="padding-top: 10px">
           <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="radio" label="1">是</el-radio>
-          <el-radio v-model="radio" label="2">否</el-radio>
+          <el-radio style="margin-left: 20px" v-model="keyanForm.ifTwoLevelAudit" label="是">是</el-radio>
+          <el-radio v-model="keyanForm.ifTwoLevelAudit" label="否">否</el-radio>
         </el-row>
       </div>
       <div class="foot"style="text-align: center;margin-top: 30px">
-        <el-button type="success" size="small" plain @click="pass">审核通过</el-button>
-        <el-button type="danger" size="small" plain @click="pass">审核未通过</el-button>
+        <el-button type="success" size="small" plain @click="keyanAuditing('审核通过')">审核通过</el-button>
+        <el-button type="danger" size="small" plain @click="keyanAuditing('审核未通过')">审核未通过</el-button>
         <el-button type="primary" size="small" plain @click="VisibleThree = false">关闭</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="VisibleFour" title="审核详情">
       <el-table
-        :data="tableData"
+        :data="tableDataFour"
         style="width: 100%">
         <el-table-column
-          prop="date"
+          prop="trainContent"
           label="培训项目名称">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="trainUnit"
           label="培训单位">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="personNum"
           label="参加人数">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="trainDay"
           label="培训天数">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="trainMoney"
           label="到款额">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="startDate"
           label="培训开始时间">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="endDate"
           label="培训结束时间">
         </el-table-column>
       </el-table>
       <el-divider />
       <div>
         <el-row style="padding-top: 10px">
+          <span style="font-weight: bolder">系部意见</span>
+        </el-row>
+        <el-row style="padding-top: 10px">
+          <el-input
+            v-model="shehuiForm.auditDesc"
+            :rows="4"
+            type="textarea"
+            placeholder="请输入内容"
+          />
+        </el-row>
+      </div>
+      <div>
+        <el-row style="padding-top: 10px">
           <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="radio" label="1">是</el-radio>
-          <el-radio v-model="radio" label="2">否</el-radio>
+          <el-radio style="margin-left: 20px" v-model="shehuiForm.ifTwoLevelAudit" label="是">是</el-radio>
+          <el-radio v-model="shehuiForm.ifTwoLevelAudit" label="否">否</el-radio>
         </el-row>
       </div>
       <div class="foot"style="text-align: center;margin-top: 30px">
-        <el-button type="success" size="small" plain @click="pass">审核通过</el-button>
-        <el-button type="danger" size="small" plain @click="pass">审核未通过</el-button>
+        <el-button type="success" size="small" plain @click="shehuiAuditing('审核通过')">审核通过</el-button>
+        <el-button type="danger" size="small" plain @click="shehuiAuditing('审核未通过')">审核未通过</el-button>
         <el-button type="primary" size="small" plain @click="VisibleFour = false">关闭</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="VisibleFive" title="审核详情">
       <el-table
-        :data="tableData"
+        :data="tableDataFive"
         style="width: 100%">
         <el-table-column
-          prop="date"
+          prop="unitName"
           label="单位名称">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="practiceContent"
           label="实践内容">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="practiceMoney"
           label="到款额">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="startDate"
           label="实践开始时间">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="endDate"
           label="实践结束时间">
         </el-table-column>
       </el-table>
       <el-divider />
       <div>
         <el-row style="padding-top: 10px">
+          <span style="font-weight: bolder">系部意见</span>
+        </el-row>
+        <el-row style="padding-top: 10px">
+          <el-input
+            v-model="shijianForm.auditDesc"
+            :rows="4"
+            type="textarea"
+            placeholder="请输入内容"
+          />
+        </el-row>
+      </div>
+      <div>
+        <el-row style="padding-top: 10px">
           <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="radio" label="1">是</el-radio>
-          <el-radio v-model="radio" label="2">否</el-radio>
+          <el-radio style="margin-left: 20px" v-model="shijianForm.ifTwoLevelAudit" label="是">是</el-radio>
+          <el-radio v-model="shijianForm.ifTwoLevelAudit" label="否">否</el-radio>
         </el-row>
       </div>
       <div class="foot"style="text-align: center;margin-top: 30px">
-        <el-button type="success" size="small" plain @click="pass">审核通过</el-button>
-        <el-button type="danger" size="small" plain @click="pass">审核未通过</el-button>
+        <el-button type="success" size="small" plain @click="shijianAuditing('审核通过')">审核通过</el-button>
+        <el-button type="danger" size="small" plain @click="shijianAuditing('审核未通过')">审核未通过</el-button>
         <el-button type="primary" size="small" plain @click="VisibleFive = false">关闭</el-button>
       </div>
     </el-dialog>
@@ -299,6 +325,7 @@
 </template>
 
 <script>
+  import { deptGetAuditingResearchList, deptGetAuditingResearchDetail,deptBeginAuditingResearch } from '@/api/allTaskData'
     export default {
         name: "reasearchAndSocail",
       data() {
@@ -312,57 +339,126 @@
             VisibleThree: false,
             VisibleFour: false,
             VisibleFive: false,
-            peopleData: [
-              {
-                subdate: '2020-12-08',
-                applypeople: '杨老师',
-                department: '计算机',
-                sub: '参与课题情况',
-                approval: '待通过'
-              },
-              {
-                subdate: '2020-12-08',
-                applypeople: '杨老师',
-                department: '计算机',
-                sub: '学术成果情况',
-                approval: '待通过'
-              },
-              {
-                subdate: '2020-12-08',
-                applypeople: '杨老师',
-                department: '计算机',
-                sub: '科研成果获奖情况',
-                approval: '待通过'
-              },
-              {
-                subdate: '2020-12-08',
-                applypeople: '杨老师',
-                department: '计算机',
-                sub: '社会培训情况',
-                approval: '待通过'
-              },
-              {
-                subdate: '2020-12-08',
-                applypeople: '杨老师',
-                department: '计算机',
-                sub: '社会实践（兼职）情况',
-                approval: '待通过'
-              }
-            ]
+            peopleData: [],
+            tableData:[],
+            ketiForm:{
+              id: '',
+              tecUsername: '',
+              ifTwoLevelAudit: '',
+              auditType: '参与课题情况',
+              auditStatus: '',
+              auditDesc: ''
+            },
+            tableDataTwo:[],
+            xueshuForm:{
+              id: '',
+              tecUsername: '',
+              ifTwoLevelAudit: '',
+              auditType: '学术成果情况',
+              auditStatus: '',
+              auditDesc: ''
+            },
+            tableDataThree:[],
+            keyanForm:{
+              id: '',
+              tecUsername: '',
+              ifTwoLevelAudit: '',
+              auditType: '科研成果获奖情况',
+              auditStatus: '',
+              auditDesc: ''
+            },
+            tableDataFour:[],
+            shehuiForm:{
+              id: '',
+              tecUsername: '',
+              ifTwoLevelAudit: '',
+              auditType: '社会培训情况',
+              auditStatus: '',
+              auditDesc: ''
+            },
+            tableDataFive:[],
+            shijianForm:{
+              id: '',
+              tecUsername: '',
+              ifTwoLevelAudit: '',
+              auditType: '社会实践（兼职）情况',
+              auditStatus: '',
+              auditDesc: ''
+            }
           }
       },
+      mounted(){
+        this.getAllAuditingList()
+      },
       methods: {
+        getAllAuditingList: function() {
+          const prams = {
+            // tecUsername: 'rmyzAdmin'
+            tecUsername: localStorage.getItem('jwt'),
+          }
+          deptGetAuditingResearchList(prams).then(response=>{
+            console.log('系部主任测试获取所有的科研待审核')
+            console.log(response.data.data)
+            this.peopleData = response.data.data
+          })
+        },
         goView: function (row) {
-          if(row.sub === '参与课题情况'){
+          if(row.auditType === '参与课题情况'){
             this.VisibleOne = true
-          } else if (row.sub === '学术成果情况'){
+            const prams = {
+              id: row.id,
+              workType: row.auditType
+            }
+            deptGetAuditingResearchDetail(prams).then( response => {
+              console.log('系部主管根据id获取详情 参与课题')
+              console.log(response.data)
+              this.tableData = response.data.data
+            })
+          } else if (row.auditType === '学术成果情况'){
             this.VisibleTwo = true
-          } else if(row.sub === '科研成果获奖情况'){
+            const prams = {
+              id: row.id,
+              workType: row.auditType
+            }
+            deptGetAuditingResearchDetail(prams).then( response => {
+              console.log('系部主管根据id获取详情 学术成果')
+              console.log(response.data)
+              this.tableDataTwo = response.data.data
+            })
+          } else if(row.auditType === '科研成果获奖情况'){
             this.VisibleThree = true
-          } else if(row.sub === '社会培训情况'){
+            const prams = {
+              id: row.id,
+              workType: row.auditType
+            }
+            deptGetAuditingResearchDetail(prams).then( response => {
+              console.log('系部主管根据id获取详情 科研成果获奖')
+              console.log(response.data)
+              this.tableDataThree = response.data.data
+              this.imgs.push(this.tableDataThree[0].picture)
+            })
+          } else if(row.auditType === '社会培训情况'){
             this.VisibleFour = true
-          } else if(row.sub === '社会实践（兼职）情况'){
+            const prams = {
+              id: row.id,
+              workType: row.auditType
+            }
+            deptGetAuditingResearchDetail(prams).then( response => {
+              console.log('系部主管根据id获取详情 社会培训情况')
+              console.log(response.data)
+              this.tableDataFour = response.data.data
+            })
+          } else if(row.auditType === '社会实践（兼职）情况'){
             this.VisibleFive = true
+            const prams = {
+              id: row.id,
+              workType: row.auditType
+            }
+            deptGetAuditingResearchDetail(prams).then( response => {
+              console.log('系部主管根据id获取详情 社会实践兼职情况')
+              console.log(response.data)
+              this.tableDataFive = response.data.data
+            })
           }
         },
         handleSizeChange(val) {
@@ -370,6 +466,121 @@
         },
         handleCurrentChange(val) {
           this.currentPage = val;
+        },
+        ketiAuditing: function (status) {
+          if(this.ketiForm.ifTwoLevelAudit === ''){
+            this.$message({
+              message: '未选择是否提交给人事处审核',
+              type: 'warning'
+            });
+          }else {
+            this.ketiForm.auditStatus = status
+            this.ketiForm.id = this.tableData[0].id
+            // this.ketiForm.tecUsername = 'rmyzAdmin'
+            this.ketiForm.tecUsername = localStorage.getItem('jwt')
+            deptBeginAuditingResearch(this.ketiForm).then(response => {
+              console.log('测试系部主管开始审核科研与社会服务 参与课题项目')
+              console.log(response.data)
+              this.VisibleOne = false
+              this.$message({
+                message: '审核完成',
+                type: 'success'
+              });
+              this.getAllAuditingList()
+            })
+          }
+        },
+        xueshuAuditing: function (status) {
+          if(this.xueshuForm.ifTwoLevelAudit === ''){
+            this.$message({
+              message: '未选择是否提交给人事处审核',
+              type: 'warning'
+            });
+          }else {
+            this.xueshuForm.auditStatus = status
+            this.xueshuForm.id = this.tableDataTwo[0].id
+            // this.xueshuForm.tecUsername = 'rmyzAdmin'
+            this.xueshuForm.tecUsername = localStorage.getItem('jwt')
+            deptBeginAuditingResearch(this.xueshuForm).then(response => {
+              console.log('测试系部主管开始审核科研与社会服务 学术成果情况')
+              console.log(response.data)
+              this.VisibleTwo = false
+              this.$message({
+                message: '审核完成',
+                type: 'success'
+              });
+              this.getAllAuditingList()
+            })
+          }
+        },
+        keyanAuditing: function (status) {
+          if(this.keyanForm.ifTwoLevelAudit === ''){
+            this.$message({
+              message: '未选择是否提交给人事处审核',
+              type: 'warning'
+            });
+          }else {
+            this.keyanForm.auditStatus = status
+            this.keyanForm.id = this.tableDataThree[0].id
+            // this.keyanForm.tecUsername = 'rmyzAdmin'
+            this.keyanForm.tecUsername = localStorage.getItem('jwt')
+            deptBeginAuditingResearch(this.keyanForm).then(response => {
+              console.log('测试系部主管开始审核科研与社会服务 科研成果获奖情况')
+              console.log(response.data)
+              this.VisibleThree = false
+              this.$message({
+                message: '审核完成',
+                type: 'success'
+              });
+              this.getAllAuditingList()
+            })
+          }
+        },
+        shehuiAuditing: function (status) {
+          if(this.shehuiForm.ifTwoLevelAudit === ''){
+            this.$message({
+              message: '未选择是否提交给人事处审核',
+              type: 'warning'
+            });
+          }else {
+            this.shehuiForm.auditStatus = status
+            this.shehuiForm.id = this.tableDataFour[0].id
+            // this.shehuiForm.tecUsername = 'rmyzAdmin'
+            this.shehuiForm.tecUsername = localStorage.getItem('jwt')
+            deptBeginAuditingResearch(this.shehuiForm).then(response => {
+              console.log('测试系部主管开始审核科研与社会服务 社会培训情况')
+              console.log(response.data)
+              this.VisibleFour = false
+              this.$message({
+                message: '审核完成',
+                type: 'success'
+              });
+              this.getAllAuditingList()
+            })
+          }
+        },
+        shijianAuditing: function (status) {
+          if(this.shijianForm.ifTwoLevelAudit === ''){
+            this.$message({
+              message: '未选择是否提交给人事处审核',
+              type: 'warning'
+            });
+          }else {
+            this.shijianForm.auditStatus = status
+            this.shijianForm.id = this.tableDataFive[0].id
+            // this.shijianForm.tecUsername = 'rmyzAdmin'
+            this.shijianForm.tecUsername = localStorage.getItem('jwt')
+            deptBeginAuditingResearch(this.shijianForm).then(response => {
+              console.log('测试系部主管开始审核科研与社会服务 社会实践兼职情况')
+              console.log(response.data)
+              this.VisibleFive = false
+              this.$message({
+                message: '审核完成',
+                type: 'success'
+              });
+              this.getAllAuditingList()
+            })
+          }
         }
       }
     }

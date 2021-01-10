@@ -8,6 +8,9 @@
       <el-radio-button v-show="perArray.indexOf(jiaoshi)!==-1" label="教师" />
       <el-radio-button v-show="perArray.indexOf(xibu)!==-1" label="系部主管" />
       <el-radio-button v-show="perArray.indexOf(renshi)!==-1" label="人事处主管" />
+<!--      <el-radio-button label="教师" />-->
+<!--      <el-radio-button label="系部主管" />-->
+<!--      <el-radio-button label="人事处主管" />-->
     </el-radio-group>
   </div>
 </template>
@@ -16,7 +19,10 @@
   import { getAllPermissions } from '@/api/login'
 export default {
   mounted() {
-    this.getAll()
+    this.getJwt()
+    setTimeout(()=>{
+      this.getAll()
+    },100)
   },
   computed: {
     roles() {
@@ -54,9 +60,17 @@ export default {
     }
   },
   methods: {
+    getJwt: function() {
+      var afterUrl = window.location.search.substring(1)
+      var afterEqual = afterUrl.substring(afterUrl.indexOf('=') + 1)
+      console.log('测试获取jwt')
+      console.log(afterEqual)
+      localStorage.setItem('jwt', afterEqual)
+    },
     getAll: function () {
       const prams = {
-        userName: '10011'
+        username: '10003'
+        // username:localStorage.getItem('jwt')
       }
       getAllPermissions(prams).then(response => {
         console.log('测试所有的权限')

@@ -298,13 +298,13 @@
           />
         </el-row>
       </div>
-      <div>
-        <el-row style="padding-top: 10px">
-          <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="jibenAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>
-          <el-radio v-model="jibenAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>
-        </el-row>
-      </div>
+<!--      <div>-->
+<!--        <el-row style="padding-top: 10px">-->
+<!--          <span style="font-weight: bolder">是否提交人事处审核</span>-->
+<!--          <el-radio style="margin-left: 20px" v-model="jibenAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>-->
+<!--          <el-radio v-model="jibenAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>-->
+<!--        </el-row>-->
+<!--      </div>-->
       <div class="foot">
         <span slot="footer" class="dialog-footer">
           <el-button type="success" size="small" plain @click="jibenAudit('审核通过')">审核通过</el-button>
@@ -416,13 +416,13 @@
           />
         </el-row>
       </div>
-      <div>
-        <el-row style="padding-top: 10px">
-          <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="xueliAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>
-          <el-radio v-model="xueliAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>
-        </el-row>
-      </div>
+<!--      <div>-->
+<!--        <el-row style="padding-top: 10px">-->
+<!--          <span style="font-weight: bolder">是否提交人事处审核</span>-->
+<!--          <el-radio style="margin-left: 20px" v-model="xueliAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>-->
+<!--          <el-radio v-model="xueliAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>-->
+<!--        </el-row>-->
+<!--      </div>-->
       <div class="foot">
         <span slot="footer" class="dialog-footer">
           <el-button type="success" size="small" plain @click="xueliAudit('审核通过')">审核通过</el-button>
@@ -638,13 +638,13 @@
           />
         </el-row>
       </div>
-      <div>
-        <el-row style="padding-top: 10px">
-          <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="zhuanliAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>
-          <el-radio v-model="zhuanliAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>
-        </el-row>
-      </div>
+<!--      <div>-->
+<!--        <el-row style="padding-top: 10px">-->
+<!--          <span style="font-weight: bolder">是否提交人事处审核</span>-->
+<!--          <el-radio style="margin-left: 20px" v-model="zhuanliAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>-->
+<!--          <el-radio v-model="zhuanliAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>-->
+<!--        </el-row>-->
+<!--      </div>-->
       <div class="foot">
         <span slot="footer" class="dialog-footer">
           <el-button type="success" size="small" plain @click="zhuanyeAudit('审核通过')">审核通过</el-button>
@@ -681,8 +681,8 @@
         </el-col>
         <el-col :span="8">
           <div class="biaoqian">
+            <span style="font-weight: bolder">结束时间</span>
             <span>{{workData.workEndDate}}</span>
-            <span>xxxxxx</span>
           </div>
         </el-col>
         <el-col :span="8">
@@ -706,13 +706,13 @@
           />
         </el-row>
       </div>
-      <div>
-        <el-row style="padding-top: 10px">
-          <span style="font-weight: bolder">是否提交人事处审核</span>
-          <el-radio style="margin-left: 20px" v-model="workAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>
-          <el-radio v-model="workAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>
-        </el-row>
-      </div>
+<!--      <div>-->
+<!--        <el-row style="padding-top: 10px">-->
+<!--          <span style="font-weight: bolder">是否提交人事处审核</span>-->
+<!--          <el-radio style="margin-left: 20px" v-model="workAuditForm.ifTwoLevelAUdit" label="是">是</el-radio>-->
+<!--          <el-radio v-model="workAuditForm.ifTwoLevelAUdit" label="否">否</el-radio>-->
+<!--        </el-row>-->
+<!--      </div>-->
       <div class="foot">
         <span slot="footer" class="dialog-footer">
           <el-button type="success" size="small" plain @click="workAudit('审核通过')">审核通过</el-button>
@@ -744,8 +744,9 @@ export default {
       xueliData: {},
       xueliAuditForm:{
         id: '',
-        tecUsername: 'rmyzAdmin',
-        ifTwoLevelAUdit: '',
+        // tecUsername: 'rmyzAdmin',
+        tecUsername: localStorage.getItem('jwt'),
+        ifTwoLevelAUdit: '否',
         auditType: '学历信息修改',
         auditStatus: '',
         auditDesc: ''
@@ -753,8 +754,8 @@ export default {
       zhuanliData: {},
       zhuanliAuditForm:{
         id: '',
-        tecUsername: 'rmyzAdmin',
-        ifTwoLevelAUdit: '',
+        tecUsername: localStorage.getItem('jwt'),
+        ifTwoLevelAUdit: '否',
         auditType: '专业能力修改',
         auditStatus: '',
         auditDesc: ''
@@ -762,8 +763,8 @@ export default {
       jibenData: {},
       jibenAuditForm:{
         id: '',
-        tecUsername: 'rmyzAdmin',
-        ifTwoLevelAUdit: '',
+        tecUsername: localStorage.getItem('jwt'),
+        ifTwoLevelAUdit: '否',
         auditType: '基本信息修改',
         auditStatus: '',
         auditDesc: ''
@@ -771,8 +772,8 @@ export default {
       workData: {},
       workAuditForm:{
         id: '',
-        tecUsername: 'rmyzAdmin',
-        ifTwoLevelAUdit: '',
+        tecUsername: localStorage.getItem('jwt'),
+        ifTwoLevelAUdit: '否',
         auditType: '工作经历新增',
         auditStatus: '',
         auditDesc: ''
@@ -785,7 +786,7 @@ export default {
   methods: {
     getAllList: function() {
       const prams = {
-        tecUsername: 'rmyzAdmin'
+        tecUsername: localStorage.getItem('jwt'),
       }
       departmentGetInformationAuditingList(prams).then(response => {
         console.log('测试所有获取个人信息的审核')

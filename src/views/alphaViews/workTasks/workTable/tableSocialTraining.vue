@@ -21,9 +21,9 @@
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.auditStatus==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.auditStatus==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.auditStatus==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='审核不通过'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='审核中'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='审核通过'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -119,7 +119,8 @@ import {getSocial, updateSocial} from "../../../../api/allTaskData";
         },
         getlist(){
            getSocial({
-             tecUsername:'rmyzAdmin',
+             // tecUsername:'rmyzAdmin',
+             tecUsername:localStorage.getItem('jwt')
            }).then( res => {
             //  console.log('res',res)
              this.matchData = res.data.data
@@ -127,7 +128,8 @@ import {getSocial, updateSocial} from "../../../../api/allTaskData";
         },
         reset(){
           this.form = {
-            tecUsername:'rmyzAdmin',
+            // tecUsername:'rmyzAdmin',
+            tecUsername:localStorage.getItem('jwt'),
            trainContent:undefined,
            trainUnit:undefined,
            personNum:undefined,
@@ -156,7 +158,8 @@ import {getSocial, updateSocial} from "../../../../api/allTaskData";
         submitMatchSuccess(){
             this.$refs["form"].validate((valid) => {
               if (valid) {
-              this.form.tecUsername = 'rmyzAdmin';
+              // this.form.tecUsername = 'rmyzAdmin';
+                this.form.tecUsername = localStorage.getItem('jwt')
               updateSocial(this.form).then(response => {
                 if (response.data.msg === '成功') {
                   this.$message({

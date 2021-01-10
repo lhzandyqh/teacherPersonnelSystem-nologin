@@ -121,7 +121,11 @@ export default {
   },
   methods: {
     beginInput: function () {
-      this.inputFlag = false
+      // this.inputFlag = false
+      this.$message({
+        message: '未到规划时间',
+        type: 'warning'
+      });
     },
     saveInput: function () {
       this.inputFlag = true
@@ -131,7 +135,8 @@ export default {
     },
     getAllplan: function () {
       const prams = {
-        tecUsername: 'rmyzAdmin'
+        // tecUsername: 'rmyzAdmin'
+        tecUsername: localStorage.getItem('jwt')
       }
       getDevelopmentPlan(prams).then(response => {
         console.log('测试获取发展规划')

@@ -29,7 +29,7 @@
             <el-button type="success" style="margin-left:15px" @click="increaseFlag=true">新增合同</el-button>
           </div>
           <div style="float: right;margin-left: 10%">
-            <el-button type="text" @click="getRetirement">查看退休人员</el-button>
+            <el-button type="text" @click="getRetirement">查看离职人员</el-button>
             <el-button type="text" @click="getZaigang">查看在岗人员</el-button>
           </div>
         </div>
@@ -54,7 +54,7 @@
         <el-row style="margin-top: 30px">
           <el-table
             ref="multipleTable"
-            :data="tabledata.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+            :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
             tooltip-effect="dark"
             style="width: 100%"
             @selection-change="handleSelectionChange"
@@ -64,29 +64,29 @@
               type="selection"
               width="55"
             />
-            <el-table-column align="center" label="编号">
+            <el-table-column align="center" label="工号">
               <template slot-scope="scope">
-                <span>{{ scope.row.id }}</span>
+                <span>{{ scope.row.teaUsername }}</span>
               </template>
             </el-table-column>
             <el-table-column align="center" label="姓名">
               <template slot-scope="scope">
-                <span>{{ scope.row.username }}</span>
+                <span>{{ scope.row.teaName }}</span>
               </template>
             </el-table-column>
             <el-table-column align="center" label="性别">
               <template slot-scope="scope">
-                <span>{{ scope.row.gender }}</span>
+                <span>{{ scope.row.sex }}</span>
               </template>
             </el-table-column>
             <el-table-column align="center" label="人员类别">
               <template slot-scope="scope">
-                <div v-if="scope.row.classFlag">
-                  <span>{{ scope.row.is_series }}</span>
-                  <el-button style="margin-left: 20px" type="text" @click="scope.row.classFlag = false">操作</el-button>
+                <div v-if="classFlag">
+                  <span>{{ scope.row.personnelType }}</span>
+                  <el-button style="margin-left: 20px" type="text" @click="classFlag = false">操作</el-button>
                 </div>
                 <div v-else>
-                  <el-select v-model="scope.row.is_series" placeholder="请选择">
+                  <el-select v-model="scope.row.personnelType" placeholder="请选择">
                     <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -94,25 +94,25 @@
                       :value="item.value"
                     />
                   </el-select>
-                  <el-button style="margin-left: 20px" type="text" @click="scope.row.classFlag = true">确定</el-button>
-                  <el-button style="margin-left: 20px" type="text" @click="scope.row.classFlag = true">取消</el-button>
+                  <el-button style="margin-left: 20px" type="text" @click="classFlag = true">确定</el-button>
+                  <el-button style="margin-left: 20px" type="text" @click="classFlag = true">取消</el-button>
                 </div>
               </template>
             </el-table-column>
             <el-table-column align="center" label="合同时间">
               <template slot-scope="scope">
-                <span style="color: red">{{ scope.row.daysUntilEnd }}</span>
+               <span> 距合同到期还剩：<span style="color: red">{{ scope.row.contractEndDate }}</span>天</span>
                 <el-button type="text" @click="beginManage">操作</el-button>
               </template>
             </el-table-column>
             <el-table-column align="center" label="工作状态">
               <template slot-scope="scope">
-                <div v-if="scope.row.statusFlag">
-                  <span>{{ scope.row.status }}</span>
-                  <el-button style="margin-left: 20px" type="text" @click="scope.row.statusFlag = false">操作</el-button>
+                <div v-if="statusFlag">
+                  <span>{{ scope.row.workStatus }}</span>
+                  <el-button style="margin-left: 20px" type="text" @click="statusFlag = false">操作</el-button>
                 </div>
                 <div v-else>
-                  <el-select v-model="scope.row.status" placeholder="请选择">
+                  <el-select v-model="scope.row.workStatus" placeholder="请选择">
                     <el-option
                       v-for="item in workoption"
                       :key="item.value"
@@ -120,8 +120,8 @@
                       :value="item.value"
                     />
                   </el-select>
-                  <el-button style="margin-left: 20px" type="text" @click="scope.row.statusFlag = true">确定</el-button>
-                  <el-button style="margin-left: 20px" type="text" @click="scope.row.statusFlag = true">取消</el-button>
+                  <el-button style="margin-left: 20px" type="text" @click="statusFlag = true">确定</el-button>
+                  <el-button style="margin-left: 20px" type="text" @click="statusFlag = true">取消</el-button>
                 </div>
               </template>
             </el-table-column>
@@ -134,7 +134,7 @@
 
             <el-table-column align="center" label="部门">
               <template slot-scope="scope">
-                <span>{{ scope.row.tDept }}</span>
+                <span>{{ scope.row.dept }}</span>
               </template>
             </el-table-column>
             <el-table-column align="center" label="操作">
@@ -152,7 +152,7 @@
             :current-page="currentPage"
             :page-sizes="[10, 20, 30]"
             :page-size="10"
-            :total="tabledata.length"
+            :total="tableData.length"
             style="margin-top:20px;"
             layout="total, sizes, prev, pager, next, jumper"
             @size-change="handleSizeChange"
@@ -860,10 +860,13 @@
 </template>
 
 <script>
+import { getPeopleConExpire } from '@/api/contractManagement'
 export default {
   name: 'Index',
   data() {
     return {
+      classFlag: true,
+      statusFlag: true,
       duanxinForm: {
         time: '',
         place: '',
@@ -997,63 +1000,64 @@ export default {
       }],
       peopleValue: '',
       dialogVisible: false,
-      tabledata: [{
-        id: '034021',
-        username: '刘老师',
-        gender: '男',
-        is_series: '在编',
-        classFlag: true,
-        daysUntilEnd: '合同距到期(8)天!',
-        statusFlag: true,
-        status: '在职',
-        tDept: '学工处'
-      }, {
-        id: '034022',
-        username: '李老师',
-        gender: '男',
-        is_series: '在编',
-        classFlag: true,
-        daysUntilEnd: '合同距到期(12)天!',
-        statusFlag: true,
-        status: '在职',
-        tDept: '人事处'
-      }, {
-        id: '034023',
-        username: '杨老师',
-        gender: '男',
-        is_series: '在编',
-        classFlag: true,
-        daysUntilEnd: '合同距到期(23)天!',
-        statusFlag: true,
-        status: '在职',
-        tDept: '网络中心'
-      }, {
-        id: '034024',
-        username: '邓老师',
-        gender: '男',
-        is_series: '在编',
-        classFlag: true,
-        daysUntilEnd: '合同距到期(45)天!',
-        statusFlag: true,
-        status: '在职',
-        tDept: '临床医学系'
-      }],
-      optionstwo: [
-        {
-          value: '临床医学系',
-          label: '临床医学系'
-        }, {
-          value: '口腔医学系',
-          label: '口腔医学系'
-        }, {
-          value: '护理系',
-          label: '护理系'
-        },
-        {
-          value: '中医与药学系',
-          label: '中医与药学系'
-        }
-      ],
+      // tabledata: [{
+      //   id: '034021',
+      //   username: '刘老师',
+      //   gender: '男',
+      //   is_series: '在编',
+      //   classFlag: true,
+      //   daysUntilEnd: '合同距到期(8)天!',
+      //   statusFlag: true,
+      //   status: '在职',
+      //   tDept: '学工处'
+      // }, {
+      //   id: '034022',
+      //   username: '李老师',
+      //   gender: '男',
+      //   is_series: '在编',
+      //   classFlag: true,
+      //   daysUntilEnd: '合同距到期(12)天!',
+      //   statusFlag: true,
+      //   status: '在职',
+      //   tDept: '人事处'
+      // }, {
+      //   id: '034023',
+      //   username: '杨老师',
+      //   gender: '男',
+      //   is_series: '在编',
+      //   classFlag: true,
+      //   daysUntilEnd: '合同距到期(23)天!',
+      //   statusFlag: true,
+      //   status: '在职',
+      //   tDept: '网络中心'
+      // }, {
+      //   id: '034024',
+      //   username: '邓老师',
+      //   gender: '男',
+      //   is_series: '在编',
+      //   classFlag: true,
+      //   daysUntilEnd: '合同距到期(45)天!',
+      //   statusFlag: true,
+      //   status: '在职',
+      //   tDept: '临床医学系'
+      // }],
+      // optionstwo: [
+      //   {
+      //     value: '临床医学系',
+      //     label: '临床医学系'
+      //   }, {
+      //     value: '口腔医学系',
+      //     label: '口腔医学系'
+      //   }, {
+      //     value: '护理系',
+      //     label: '护理系'
+      //   },
+      //   {
+      //     value: '中医与药学系',
+      //     label: '中医与药学系'
+      //   }
+      // ],
+      tableData: [],
       multipleSelection: [],
       piliangFlag: false,
       teacherNameArray: [],
@@ -1061,6 +1065,7 @@ export default {
     }
   },
   mounted() {
+    this.getContract()
   },
   methods: {
     handleClose(done) {
@@ -1074,6 +1079,11 @@ export default {
     findTeacherContract: function() {
     },
     getContract: function() {
+      getPeopleConExpire().then(response => {
+        console.log('测试合同管理获取合同快到期的人员名单')
+        console.log(response)
+        this.tableData = response.data.data
+      })
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)

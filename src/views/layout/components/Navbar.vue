@@ -43,9 +43,9 @@
           <el-dropdown-item divided>
             <switch-roles @change="handleRolesChange" />
           </el-dropdown-item>
-          <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
-          </el-dropdown-item>
+<!--          <el-dropdown-item divided>-->
+<!--            <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>-->
+<!--          </el-dropdown-item>-->
         </el-dropdown-menu>
       </el-dropdown>
     </div>

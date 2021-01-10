@@ -8,6 +8,7 @@
 
 <script>
   import echarts from 'echarts'
+  import { getSeniorTeacherEchartsData } from '@/api/allChangeAnalysis'
   require('echarts/theme/macarons') // echarts theme
     export default {
       name: "departmentChartThree",
@@ -61,9 +62,26 @@
         }
       },
       mounted() {
-        this.initChart()
+        this.getChartData()
+        // this.initChart()
+        setTimeout(()=> {
+          this.initChart()
+        },500)
       },
       methods: {
+        getChartData: function() {
+          const prams = {
+            tecUsername: 'rmyzAdmin',
+            // tecUsername: localStorage.getItem('jwt')
+            authority: '人事处主管'
+          }
+          getSeniorTeacherEchartsData(prams).then(response => {
+            console.log('人事处主管测试高级职称的数据')
+            console.log(response.data)
+            this.option.series[0].data[0].value = response.data.data.highPositionTitleNums
+            this.option.series[0].data[1].value = response.data.data.notHighPositionTitileNums
+          })
+        },
         initChart: function() {
           this.chart = echarts.init(document.getElementById('per_six'), 'macarons')
           this.chart.setOption(this.option)

@@ -15,9 +15,9 @@
       </el-table-column>
       <el-table-column label="审核状态">
         <template slot-scope="scope">
-          <el-tag  v-if="scope.row.auditStatus==='未开始'" type="danger" >审核不通过</el-tag>
-          <el-tag  v-if="scope.row.auditStatus==='待审核'" >审核中</el-tag>
-          <el-tag  v-if="scope.row.auditStatus==='已结束'" type="success">审核通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='审核不通过'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='审核中'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.auditStatus==='审核通过'" type="success">审核通过</el-tag>
         </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
@@ -127,7 +127,8 @@ import { teaBeCounselorInfosGetByTecUsername, teaBeCounselorInfoSet } from '@/ap
         },
         submitMatchSuccess(){
           console.log("Form", this.form)
-          this.form.tecUsername = 'rmyzAdmin'
+          // this.form.tecUsername = 'rmyzAdmin'
+          this.form.tecUsername = localStorage.getItem('jwt')
            console.log("Form", this.form)
           teaBeCounselorInfoSet(this.form).then(res => {
             if(res.data.code === 0) {
@@ -163,7 +164,8 @@ import { teaBeCounselorInfosGetByTecUsername, teaBeCounselorInfoSet } from '@/ap
           });
         },
         getList() {
-          var username = 'rmyzAdmin'
+          // var username = 'rmyzAdmin'
+          var username = localStorage.getItem('jwt')
           teaBeCounselorInfosGetByTecUsername(username).then(res => {
             this.matchData = res.data.data
           })

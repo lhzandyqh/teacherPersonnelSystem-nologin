@@ -8,6 +8,7 @@
 
 <script>
   import echarts from 'echarts'
+  import { getTeacherAbilityRadarData } from '@/api/allChangeAnalysis'
   require('echarts/theme/macarons') // echarts theme
     export default {
       name: "departmentChartOne",
@@ -35,9 +36,9 @@
                   { text: '个人发展' }
                 ],
                 center: ['50%', '50%'],
-                radius: 120,
-                startAngle: 90,
-                splitNumber: 4,
+                radius: 90,
+                startAngle: 0,
+                splitNumber: 5,
                 shape: 'circle',
                 name: {
                   formatter: '【{value}】',
@@ -77,7 +78,7 @@
                 },
                 data: [
                   {
-                    value: [84, 62, 73, 80],
+                    value: [],
                     name: '标准值',
                     symbol: 'rect',
                     symbolSize: 5,
@@ -86,7 +87,7 @@
                     }
                   },
                   {
-                    value: [90, 52, 43, 53],
+                    value: [],
                     name: '当前值',
                     areaStyle: {
                       color: 'rgba(255, 255, 255, 0.5)'
@@ -99,8 +100,10 @@
         }
       },
       mounted() {
-        this.initChart()
-        this.chartRes()
+        this.getEchartData()
+        setTimeout(()=>{
+          this.initChart()
+        },500)
       },
       methods: {
         initChart: function() {
@@ -126,6 +129,26 @@
             console.log('111')
           })
         },
+        getEchartData: function () {
+          const prams = {
+            tecUsername: 'rmyzAdmin',
+            // tecUsername: localStorage.getItem('jwt')
+            authority: '人事处主管'
+          }
+          getTeacherAbilityRadarData(prams).then(resposne => {
+            console.log('人事处主管测试获取雷达图数据')
+            console.log(resposne.data)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.teachAndMajorDevStandardNums)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.stuManageWorkStandardNums)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.sciAndSocialServiceSandardNums)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.personnelDevStandardNums)
+            // console.log(resposne.data.data.currentValue)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.teachAndMajorDevTotalNums)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.stuManageWorkTotalNums)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.sciAndSocialServiceTotalNums)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.personnelDevTotalNums)
+          })
+        }
       }
     }
 </script>

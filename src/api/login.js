@@ -30,7 +30,7 @@ export function getUserInfo(token) {
 export function loginByUsername(parems) {
   return request({
     url: 'userlogin/getUserRoleInfo',
-    method: 'post',
+    method: 'get',
     params: parems
   })
 }

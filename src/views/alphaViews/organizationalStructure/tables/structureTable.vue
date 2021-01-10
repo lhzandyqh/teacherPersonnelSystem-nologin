@@ -43,6 +43,15 @@
         </template>
       </el-table-column>
     </el-table>
+<!--    <el-pagination-->
+<!--      :current-page="currentPage4"-->
+<!--      :page-sizes="[10, 20, 30, 40]"-->
+<!--      :page-size="10"-->
+<!--      layout="total, sizes, prev, pager, next, jumper"-->
+<!--      :total="6"-->
+<!--      @size-change="handleSizeChange"-->
+<!--      @current-change="handleCurrentChange"-->
+<!--    />-->
   </div>
 </template>
 

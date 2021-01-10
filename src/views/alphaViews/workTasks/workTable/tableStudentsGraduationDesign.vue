@@ -17,12 +17,12 @@
       </el-table-column>
       <el-table-column prop="endDate" label="结束时间" >
       </el-table-column>
-      <el-table-column label="审核状态" prop="checkStatus">
-<!--        <template slot-scope="scope">-->
-<!--          <el-tag  v-if="scope.row.academicprogress==='未开始'" type="danger" >审核不通过</el-tag>-->
-<!--          <el-tag  v-if="scope.row.academicprogress==='待审核'" >审核中</el-tag>-->
-<!--          <el-tag  v-if="scope.row.academicprogress==='已结束'" type="success">审核通过</el-tag>-->
-<!--        </template>-->
+      <el-table-column label="审核状态">
+        <template slot-scope="scope" >
+          <el-tag  v-if="scope.row.checkStatus==='审核不通过'" type="danger" >审核不通过</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核中'" >审核中</el-tag>
+          <el-tag  v-if="scope.row.checkStatus==='审核通过'" type="success">审核通过</el-tag>
+        </template>
       </el-table-column>
       <!--      <el-table-column  label="详情">-->
       <!--        <template slot-scope="scope">-->
@@ -103,7 +103,8 @@
       },
       methods: {
         getGraduateList() {
-          const username = 'rmyzAdmin';
+          // const username = 'rmyzAdmin';
+          const username = localStorage.getItem('jwt');
           guideGraduateSelect({
             usrname: username
           }).then(res => {
@@ -150,7 +151,8 @@
           this.addMatchVisible = true;
         },
         submitMatchSuccess(){
-          const username = 'rmyzAdmin';
+          // const username = 'rmyzAdmin';
+          const username = localStorage.getItem('jwt')
           this.form.usrName = username
           guideGraduateAdd(this.form).then(res => {
             if (res.data.code === 0) {
