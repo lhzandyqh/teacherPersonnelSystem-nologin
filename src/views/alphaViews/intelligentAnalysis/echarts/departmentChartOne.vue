@@ -134,8 +134,8 @@
         },
         getEchartData: function () {
           const prams = {
-            tecUsername: 'rmyzAdmin',
-            // tecUsername: localStorage.getItem('jwt')
+            // tecUsername: 'rmyzAdmin',
+            tecUsername: localStorage.getItem('jwt'),
             authority: '系部主管'
           }
           getTeacherAbilityRadarData(prams).then(resposne => {

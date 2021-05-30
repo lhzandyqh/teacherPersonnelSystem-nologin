@@ -5,19 +5,15 @@
         <div style="display: flex;align-items: center;margin: 15px 0;">
           <div style="font-size: 14px;margin: 0 15px;font-weight: bolder;width: 100px">请选择部门:</div>
           <div>
-            <el-select v-model="valuea" placeholder="请选择部门">
-              <el-option
-                v-for="item in optionstwo"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                :disabled="item.disabled"
-              />
-            </el-select>
+            <el-cascader
+              v-model="searchForm.dept"
+              :options="orgOptions"
+              :props="defaultProps"
+              @change="handleChange"></el-cascader>
           </div>
           <div style="font-size: 14px;margin-right: 15px;font-weight: bolder;margin-left: 15px;width: 150px">请输入教师姓名:</div>
           <div>
-            <el-input v-model="input" placeholder="请输入姓名" />
+            <el-input v-model="searchForm.name" placeholder="请输入姓名" />
           </div>
           <div>
             <el-button type="primary" style="margin-left:15px" @click="findTeacherContract">查询</el-button>
@@ -29,172 +25,252 @@
             <el-button type="success" style="margin-left:15px" @click="increaseFlag=true">新增合同</el-button>
           </div>
           <div style="float: right;margin-left: 10%">
-            <el-button type="text" @click="getRetirement">查看离职人员</el-button>
+            <el-button type="text" @click="getLeavePeople">查看离职人员</el-button>
             <el-button type="text" @click="getZaigang">查看在岗人员</el-button>
           </div>
         </div>
       </el-row>
       <el-divider />
-      <div>
+      <div v-if="tableFlag">
+        <div>
+          <el-row>
+            <el-col :span="1">
+              <img style="width: 20px;height: 20px" src="../../../assets/piliang.png">
+            </el-col>
+            <el-col :span="2">
+              <span style="font-size: 13px;margin-left: -20px;font-weight: bolder;color: deepskyblue;cursor: pointer" @click="piliangControl">批量操作</span>
+            </el-col>
+            <el-col :span="21">
+              <div v-if="piliangFlag" style="float: right">
+                <span style="font-size: 13px;margin-left: -20px;font-weight: bolder;color: deepskyblue;cursor: pointer" @click="leavePiliangControl">退出批量操作</span>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
         <el-row>
-          <el-col :span="1">
-            <img style="width: 20px;height: 20px" src="../../../assets/piliang.png">
-          </el-col>
-          <el-col :span="2">
-            <span style="font-size: 13px;margin-left: -20px;font-weight: bolder;color: deepskyblue;cursor: pointer" @click="piliangControl">批量操作</span>
-          </el-col>
-          <el-col :span="21">
-            <div v-if="piliangFlag" style="float: right">
-              <span style="font-size: 13px;margin-left: -20px;font-weight: bolder;color: deepskyblue;cursor: pointer" @click="leavePiliangControl">退出批量操作</span>
-            </div>
-          </el-col>
+          <el-row style="margin-top: 30px">
+            <el-table
+              ref="multipleTable"
+              :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+              tooltip-effect="dark"
+              style="width: 100%"
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column
+                v-if="piliangFlag"
+                type="selection"
+                width="55"
+              />
+              <el-table-column align="center" label="工号">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.teaUsername }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="姓名">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.teaName }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="性别">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.sex }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="人员类别">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.personnelFlag === 0">
+                    <span>{{ scope.row.personnelType }}</span>
+                    <el-button style="margin-left: 20px" type="text" @click="peopleTypeChange(scope.row)">操作</el-button>
+                  </div>
+                  <div v-else>
+                    <el-select v-model="typeForm.personnelType" placeholder="请选择">
+                      <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                    <el-button style="margin-left: 20px" type="text" @click="confirmChangeType(scope.row)">确定</el-button>
+                    <el-button style="margin-left: 20px" type="text" @click="cancelChangeType(scope.row)">取消</el-button>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="合同时间">
+                <template slot-scope="scope">
+                  <span> 距合同到期还剩：<span style="color: red">{{ scope.row.contractEndDate }}</span>天</span>
+                  <el-button type="text" @click="beginManage(scope.row)">操作</el-button>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="工作状态">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.workFlag === 0">
+                    <span>{{ scope.row.workStatus }}</span>
+                    <el-button style="margin-left: 20px" type="text" @click="workStatusChange(scope.row)">操作</el-button>
+                  </div>
+                  <div v-else>
+                    <el-select v-model="workForm.workStatus" placeholder="请选择">
+                      <el-option
+                        v-for="item in workoption"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                    <el-button style="margin-left: 20px" type="text" @click="confirmChangeWork(scope.row)">确定</el-button>
+                    <el-button style="margin-left: 20px" type="text" @click="cancelChangeWork(scope.row)">取消</el-button>
+                  </div>
+                </template>
+              </el-table-column>
+
+              <!--        <el-table-column align="center" label="年龄">-->
+              <!--          <template slot-scope="scope">-->
+              <!--            <span>{{ scope.row.certLevel }}</span>-->
+              <!--          </template>-->
+              <!--        </el-table-column>-->
+
+              <el-table-column align="center" label="部门">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.dept }}</span>
+                </template>
+              </el-table-column>
+              <!--            <el-table-column align="center" label="操作">-->
+              <!--              <template slot-scope="scope">-->
+              <!--                <el-button type="text" @click="lookTeacherData(scope.row)">查看教师信息</el-button>-->
+              <!--              </template>-->
+              <!--            </el-table-column>-->
+            </el-table>
+          </el-row>
+          <div v-if=" piliangFlag" style="margin-top: 20px">
+            <el-button @click="beginPiliang">短信提醒</el-button>
+          </div>
+          <div class="fenye">
+            <el-pagination
+              :current-page="currentPage"
+              :page-sizes="[5, 10, 15]"
+              :page-size="pagesize"
+              :total="tableData.length"
+              style="margin-top:20px;"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </div>
         </el-row>
       </div>
-      <el-row>
-        <el-row style="margin-top: 30px">
-          <el-table
-            ref="multipleTable"
-            :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
-            tooltip-effect="dark"
-            style="width: 100%"
-            @selection-change="handleSelectionChange"
-          >
-            <el-table-column
-              v-if="piliangFlag"
-              type="selection"
-              width="55"
+      <div v-else>
+        <div>
+          <el-row>
+            <el-col :span="1">
+              <img style="width: 20px;height: 20px" src="../../../assets/piliang.png">
+            </el-col>
+            <el-col :span="2">
+              <span style="font-size: 13px;margin-left: -20px;font-weight: bolder;color: deepskyblue;cursor: pointer" @click="piliangControlTwo">批量操作</span>
+            </el-col>
+            <el-col :span="21">
+              <div v-if="piliangFlagTwo" style="float: right">
+                <span style="font-size: 13px;margin-left: -20px;font-weight: bolder;color: deepskyblue;cursor: pointer" @click="leavePiliangControlTwo">退出批量操作</span>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+        <el-row>
+          <el-row style="margin-top: 30px">
+            <el-table
+              ref="multipleTable"
+              :data="tableDataTwo.slice((currentPage2-1)*pagesize,currentPage2*pagesize)"
+              tooltip-effect="dark"
+              style="width: 100%"
+              @selection-change="handleSelectionChangeTwo"
+            >
+              <el-table-column
+                v-if="piliangFlagTwo"
+                type="selection"
+                width="55"
+              />
+              <el-table-column align="center" label="工号">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.teaUsername }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="姓名">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.teaName }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="性别">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.sex }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="部门">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.dept }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="离校时间">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.sex }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="合同时间">
+                <template slot-scope="scope">
+                  <span> 距合同到期还剩：<span style="color: red">{{ scope.row.contractEndDate }}</span>天</span>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-row>
+          <div v-if=" piliangFlagTwo" style="margin-top: 20px">
+            <el-button @click="beginPiliang">批量导出</el-button>
+          </div>
+          <div class="fenye">
+            <el-pagination
+              :current-page="currentPage2"
+              :page-sizes="[5, 10, 15]"
+              :page-size="pagesize2"
+              :total="tableDataTwo.length"
+              style="margin-top:20px;"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="handleSizeChangeTwo"
+              @current-change="handleCurrentChangeTwo"
             />
-            <el-table-column align="center" label="工号">
-              <template slot-scope="scope">
-                <span>{{ scope.row.teaUsername }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="姓名">
-              <template slot-scope="scope">
-                <span>{{ scope.row.teaName }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="性别">
-              <template slot-scope="scope">
-                <span>{{ scope.row.sex }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="人员类别">
-              <template slot-scope="scope">
-                <div v-if="classFlag">
-                  <span>{{ scope.row.personnelType }}</span>
-                  <el-button style="margin-left: 20px" type="text" @click="classFlag = false">操作</el-button>
-                </div>
-                <div v-else>
-                  <el-select v-model="scope.row.personnelType" placeholder="请选择">
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                  <el-button style="margin-left: 20px" type="text" @click="classFlag = true">确定</el-button>
-                  <el-button style="margin-left: 20px" type="text" @click="classFlag = true">取消</el-button>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="合同时间">
-              <template slot-scope="scope">
-               <span> 距合同到期还剩：<span style="color: red">{{ scope.row.contractEndDate }}</span>天</span>
-                <el-button type="text" @click="beginManage">操作</el-button>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="工作状态">
-              <template slot-scope="scope">
-                <div v-if="statusFlag">
-                  <span>{{ scope.row.workStatus }}</span>
-                  <el-button style="margin-left: 20px" type="text" @click="statusFlag = false">操作</el-button>
-                </div>
-                <div v-else>
-                  <el-select v-model="scope.row.workStatus" placeholder="请选择">
-                    <el-option
-                      v-for="item in workoption"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                  <el-button style="margin-left: 20px" type="text" @click="statusFlag = true">确定</el-button>
-                  <el-button style="margin-left: 20px" type="text" @click="statusFlag = true">取消</el-button>
-                </div>
-              </template>
-            </el-table-column>
-
-            <!--        <el-table-column align="center" label="年龄">-->
-            <!--          <template slot-scope="scope">-->
-            <!--            <span>{{ scope.row.certLevel }}</span>-->
-            <!--          </template>-->
-            <!--        </el-table-column>-->
-
-            <el-table-column align="center" label="部门">
-              <template slot-scope="scope">
-                <span>{{ scope.row.dept }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" label="操作">
-              <template slot-scope="scope">
-                <el-button type="text" @click="lookTeacherData(scope.row)">查看教师信息</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+          </div>
         </el-row>
-        <div v-if=" piliangFlag" style="margin-top: 20px">
-          <el-button @click="beginPiliang">短信提醒</el-button>
-        </div>
-        <div class="fenye">
-          <el-pagination
-            :current-page="currentPage"
-            :page-sizes="[10, 20, 30]"
-            :page-size="10"
-            :total="tableData.length"
-            style="margin-top:20px;"
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
-      </el-row>
+      </div>
       <el-dialog
         :visible.sync="increaseFlag"
         :before-close="handleClose"
         title="新增合同"
         width="40%"
       >
-        <el-form ref="form" :model="form" label-width="120px">
+        <el-form ref="form" :model="addForm" label-width="120px">
+          <el-form-item label="教师工号">
+            <el-input v-model="addForm.teaId" />
+          </el-form-item>
           <el-form-item label="教师姓名">
-            <el-input v-model="form.name" />
+            <el-input v-model="addForm.teaName" />
           </el-form-item>
-          <el-form-item label="姓名全拼">
-            <el-input v-model="form.quanping" />
-          </el-form-item>
+<!--          <el-form-item label="姓名全拼">-->
+<!--            <el-input v-model="form.quanping" />-->
+<!--          </el-form-item>-->
           <el-form-item label="性别">
-            <el-input v-model="form.gender" />
+            <el-input v-model="addForm.sex" />
           </el-form-item>
           <el-form-item label="身份证号码">
-            <el-input v-model="form.idNumber" />
+            <el-input v-model="addForm.idCard" />
           </el-form-item>
           <el-form-item label="手机号码">
-            <el-input v-model="form.phone" />
+            <el-input v-model="addForm.phoneNum" />
           </el-form-item>
           <el-form-item label="部门">
-            <el-select v-model="form.gradeGroup" placeholder="请选择部门">
-              <el-option
-                v-for="item in optionstwo"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                :disabled="item.disabled"
-              />
-            </el-select>
+            <el-cascader
+              v-model="addForm.dept"
+              :options="orgOptions"
+              :props="defaultProps"
+              @change="handleChange"></el-cascader>
           </el-form-item>
           <el-form-item label="人员类别">
-            <el-select v-model="form.peopleClass" placeholder="请选择人员类别">
+            <el-select v-model="addForm.personnelType" placeholder="请选择人员类别">
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -206,16 +282,16 @@
           </el-form-item>
           <el-form-item label="合同开始时间">
             <el-col :span="11">
-              <el-date-picker v-model="form.begindate" value-format="yyyy-MM-dd" type="date" placeholder="选择日期" style="width: 100%;" />
+              <el-date-picker v-model="addForm.contractStartTime" value-format="yyyy-MM-dd" type="date" placeholder="选择日期" style="width: 100%;" />
             </el-col>
           </el-form-item>
           <el-form-item label="合同结束时间">
             <el-col :span="11">
-              <el-date-picker v-model="form.enddate" value-format="yyyy-MM-dd" type="date" placeholder="选择日期" style="width: 100%;" />
+              <el-date-picker v-model="addForm.contractEndTime" value-format="yyyy-MM-dd" type="date" placeholder="选择日期" style="width: 100%;" />
             </el-col>
           </el-form-item>
         </el-form>
-        <span slot="footer" class="dialog-footer">-
+        <span slot="footer" class="dialog-footer">
           <el-button @click="increaseFlag = false">取 消</el-button>
           <el-button type="primary" @click="increaseContract">确 定</el-button>
         </span>
@@ -233,7 +309,7 @@
             </div>
           </el-col>
           <el-col :span="6">
-            <el-select v-model="hetongvalue" placeholder="" @change="changeHetongStatus">
+            <el-select v-model="contractForm.contractUpdate" placeholder="" @change="changeHetongStatus">
               <el-option
                 v-for="item in hetongoptions"
                 :key="item.value"
@@ -244,7 +320,7 @@
           </el-col>
           <el-col :span="6">
             <div v-if="secondFlag" style="margin-left: 20px">
-              <el-select v-model="hetongAfter" placeholder="请选择">
+              <el-select v-model="contractForm.workStatus" placeholder="请选择">
                 <el-option
                   v-for="item in optionThree"
                   :key="item.value"
@@ -263,19 +339,23 @@
           </el-col>
           <el-col v-if="hetongFlag" :span="10">
             <el-date-picker
-              v-model="hetongDate"
+              v-model="contractForm.hetongDate"
               type="daterange"
               range-separator="-"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
             />
           </el-col>
           <el-col v-else :span="10">
             <el-date-picker
-              v-model="hetongDate"
+              v-model="contractForm.hetongDate"
               disabled
               type="daterange"
               range-separator="-"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
             />
@@ -283,7 +363,7 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+          <el-button type="primary" @click="confirmNewContract">确 定</el-button>
         </span>
       </el-dialog>
       <el-dialog
@@ -860,11 +940,16 @@
 </template>
 
 <script>
-import { getPeopleConExpire } from '@/api/contractManagement'
+import {
+  getPeopleConExpire,getPeopleOnjob,searchTeacherByCondition,personnelAddNewContract,personnelSetPeopleType,personnelSetWorkStatus,
+  personnelGetLeavePeople,personnelChangeContractStatus} from '@/api/contractManagement'
+import { perGetAllOrg } from '@/api/authorityManagement'
 export default {
   name: 'Index',
   data() {
     return {
+      tableFlag: true,
+      orgOptions: [],
       classFlag: true,
       statusFlag: true,
       duanxinForm: {
@@ -941,7 +1026,9 @@ export default {
       valuea: '',
       input: '',
       currentPage: 1,
-      pagesize: 10,
+      currentPage2: 1,
+      pagesize: 5,
+      pagesize2: 5,
       hetongFlag: true,
       hetongDate: [],
       hetongvalue: '',
@@ -1058,16 +1145,119 @@ export default {
       //   }
       // ],
       tableData: [],
+      tableDataTwo: [],
       multipleSelection: [],
+      multipleSelectionTwo: [],
       piliangFlag: false,
+      piliangFlagTwo: false,
       teacherNameArray: [],
-      salaryFlag: false
+      salaryFlag: false,
+      searchForm: {
+        dept: [],
+        name: ''
+      },
+      typeForm: {
+        personnelType: '',
+        id: ''
+      },
+      workForm: {
+        workStatus: '',
+        id: ''
+      },
+      addForm: {
+        teaId: '',
+        teaName: '',
+        sex: '',
+        idCard: '',
+        phoneNum: '',
+        dept: [],
+        personnelType: '',
+        contractStartTime: '',
+        contractEndTime: ''
+      },
+      contractForm: {
+        id: '',
+        contractUpdate: '',
+        workStatus: '',
+        hetongDate: [],
+        // contractStartDate: '',
+        // contractEndDate: ''
+      },
+      defaultProps: {
+        children: 'children',
+        label: 'orgName',
+        value: 'orgName'
+      }
     }
   },
   mounted() {
     this.getContract()
+    this.getAllOrg()
+    // this.getLeavePeople()
   },
   methods: {
+    getLeavePeople: function (){
+      this.tableFlag = false
+      personnelGetLeavePeople().then(response => {
+        console.log('测试查看离职人员')
+        console.log(response.data)
+        this.tableDataTwo = response.data.data
+      })
+    },
+    peopleTypeChange: function (row){
+      row.personnelFlag = 1
+      this.typeForm.personnelType = ''
+    },
+    confirmChangeType: function (row){
+      const prams = {
+        id: row.id,
+        personnelType: this.typeForm.personnelType
+      }
+      console.log('测试设置人员类别参数')
+      console.log(prams)
+      personnelSetPeopleType(prams).then(response => {
+        console.log('测试人事处设置人员类别')
+        console.log(response.data)
+        // row.personnelFlag = 0
+        this.$message({
+          message: '设置成功',
+          type: 'success'
+        });
+        row.personnelType = this.typeForm.personnelType
+        // this.getZaigang()
+      })
+    },
+    cancelChangeType: function (row){
+      console.log(row)
+      row.personnelFlag = 0
+    },
+    workStatusChange: function (row){
+      row.workFlag = 1
+      this.workForm.workStatus = ''
+    },
+    confirmChangeWork: function (row){
+      const prams = {
+        id: row.id,
+        workStatus: this.workForm.workStatus
+      }
+      console.log('测试设置人员工作状态参数')
+      console.log(prams)
+      personnelSetWorkStatus(prams).then(response => {
+        console.log('测试人事处设置人员工作状态')
+        console.log(response.data)
+        // row.personnelFlag = 0
+        this.$message({
+          message: '设置成功',
+          type: 'success'
+        });
+        row.workStatus = this.workForm.workStatus
+        // this.getZaigang()
+      })
+    },
+    cancelChangeWork: function (row){
+      console.log(row)
+      row.workFlag = 0
+    },
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
@@ -1075,10 +1265,82 @@ export default {
         })
         .catch(_ => {})
     },
-    increaseContract: function() {},
+    increaseContract: function() {
+      if(this.addForm.teaId === ''|| this.addForm.teaName === ''||this.addForm.sex === ''|| this.addForm.idCard === ''|| this.addForm.phoneNum === '' || this.addForm.dept === [] || this.addForm.personnelType === '' || this.addForm.contractEndTime === ''||this.addForm.contractStartTime === ''){
+        this.$message({
+          message: '教师信息未填写完整',
+          type: 'warning'
+        })
+      } else {
+        const prams = {
+          teaId: this.addForm.teaId,
+          teaName: this.addForm.teaName,
+          sex: this.addForm.sex,
+          idCard: this.addForm.idCard,
+          phoneNum: this.addForm.phoneNum,
+          dept: this.addForm.dept[this.addForm.dept.length-1],
+          personnelType: this.addForm.personnelType,
+          contractStartTime: this.addForm.contractStartTime,
+          contractEndTime: this.addForm.contractEndTime
+        }
+        console.log('测试新增合同的新参数')
+        console.log(prams)
+        personnelAddNewContract(prams).then(response => {
+          console.log('测试新增合同参数')
+          console.log(response.data)
+          this.$message({
+            message: '新增成功',
+            type: 'success'
+          })
+          this.addForm.teaId = ''
+          this.addForm.teaName = ''
+          this.addForm.sex = ''
+          this.addForm.idCard = ''
+          this.addForm.phoneNum = ''
+          this.addForm.dept = []
+          this.addForm.personnelType = ''
+          this.addForm.contractStartTime = ''
+          this.addForm.contractEndTime = ''
+          this.increaseFlag = false
+        })
+      }
+    },
     findTeacherContract: function() {
+      if(this.searchForm.dept.length === 0 && this.searchForm.name === ''){
+        this.$message({
+          message: '选择条件未填写',
+          type: 'warning'
+        })
+      }else {
+        const prams = {
+          dept: this.searchForm.dept[this.searchForm.dept.length-1],
+          teaName: this.searchForm.name
+        }
+        console.log('测试搜索条件')
+        console.log(prams)
+        searchTeacherByCondition(prams).then(response => {
+          console.log('测试根据条件获取教师合同')
+          console.log(response.data)
+          if(response.data.data.length === 0){
+            this.tableData = response.data.data
+            this.$message({
+              message: '未查询到相关教师',
+              type: 'warning'
+            })
+          }else {
+            this.$message({
+              message: '查询成功',
+              type: 'success'
+            })
+            this.tableData = response.data.data
+            // this.searchForm.dept = []
+            // this.searchForm.name = ''
+          }
+        })
+      }
     },
     getContract: function() {
+      this.tableFlag = true
       getPeopleConExpire().then(response => {
         console.log('测试合同管理获取合同快到期的人员名单')
         console.log(response)
@@ -1093,12 +1355,26 @@ export default {
       console.log(`当前页: ${val}`)
       this.currentPage = val
     },
+    handleSizeChangeTwo(val) {
+      console.log(`每页 ${val} 条`)
+      this.pagesize2 = val
+    },
+    handleCurrentChangeTwo(val) {
+      console.log(`当前页: ${val}`)
+      this.currentPage2 = val
+    },
     getRetirement: function() {
     },
     getZaigang: function() {
+      this.tableFlag = true
+      getPeopleOnjob().then(response => {
+        console.log('测试获取在岗人员')
+        console.log(response.data)
+        this.tableData = response.data.data
+      })
     },
     changeHetongStatus: function() {
-      if (this.hetongvalue === '更新合同') {
+      if (this.contractForm.contractUpdate === '更新合同') {
         this.hetongFlag = true
         this.secondFlag = false
       } else {
@@ -1118,8 +1394,11 @@ export default {
     cancelGongzuoFlag: function() {
       this.gongzuoFlag = true
     },
-    beginManage: function() {
+    beginManage: function(row) {
+      this.contractForm.id = row.id
       this.dialogVisible = true
+      console.log('测试合同更新获取时间')
+      console.log(this.contractForm.id)
     },
     getTeachGroupList: function() {
     },
@@ -1137,11 +1416,21 @@ export default {
       this.multipleSelection = val
       console.log(this.multipleSelection)
     },
+    handleSelectionChangeTwo(val) {
+      this.multipleSelectionTwo = val
+      console.log(this.multipleSelectionTwo)
+    },
     piliangControl: function() {
       this.piliangFlag = true
     },
+    piliangControlTwo: function() {
+      this.piliangFlagTwo = true
+    },
     leavePiliangControl: function() {
       this.piliangFlag = false
+    },
+    leavePiliangControlTwo: function() {
+      this.piliangFlagTwo = false
     },
     beginPiliang: function() {
     },
@@ -1152,6 +1441,43 @@ export default {
     },
     beginDuanxin: function() {
 
+    },
+    getAllOrg: function (){
+      perGetAllOrg().then(response => {
+        console.log('合同管理测试获取所有的组织')
+        console.log(response.data)
+        this.orgOptions = response.data.data.children
+      })
+    },
+    handleChange(value) {
+      console.log(value);
+      this.condition = value
+    },
+    confirmNewContract: function (){
+      const prams = {
+        id: this.contractForm.id,
+        contractUpdate: this.contractForm.contractUpdate,
+        workStatus: this.contractForm.workStatus,
+        contractStartDate: this.contractForm.hetongDate[0],
+        contractEndDate: this.contractForm.hetongDate[1]
+      }
+      // this.dialogVisible = false
+      console.log('测试更新合同的参数')
+      console.log(prams)
+      personnelChangeContractStatus(prams).then(response => {
+        console.log('测试更新合同接口')
+        console.log(response.data)
+        this.$message({
+          message: '合同更新成功',
+          type: 'success'
+        });
+        this.contractForm.id = ''
+        this.contractForm.contractUpdate = ''
+        this.contractForm.workStatus = ''
+        this.contractForm.hetongDate = []
+        this.dialogVisible = false
+        this.getZaigang()
+      })
     }
   }
 }

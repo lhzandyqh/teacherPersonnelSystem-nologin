@@ -136,18 +136,18 @@ export const asyncRoutes = [
   //     }
   //   ]
   // },
-  {
-    path: '/careerDevelopment',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/alphaViews/careerDevelopment/index'),
-        name: 'careerDevelopment',
-        meta: { title: '发展规划', roles: ['教师'], icon: 'icon', noCache: true }
-      }
-    ]
-  },
+  // {
+  //   path: '/careerDevelopment',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/alphaViews/careerDevelopment/index'),
+  //       name: 'careerDevelopment',
+  //       meta: { title: '发展规划', roles: ['教师'], icon: 'icon', noCache: true }
+  //     }
+  //   ]
+  // },
   {
     path: '/worktasks',
     component: Layout,
@@ -192,7 +192,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/alphaViews/organizationalStructure/index'),
         name: 'organizationalstructure',
-        meta: { title: '组织结构', roles: ['系部主管', '人事处主管'], icon: 'tree', noCache: true }
+        meta: { title: '组织结构', roles: ['人事处主管'], icon: 'tree', noCache: true }
       }
     ]
   },
@@ -312,32 +312,65 @@ export const asyncRoutes = [
       //     roles: ['系部主管', '人事处主管', '教师'] // or you can only set roles in subTable nav
       //   }
       // },
-      {
-        path: 'batchimport',
-        component: () => import('@/views/alphaViews/smartService/batchImport'),
-        name: 'batchimport',
-        meta: {
-          title: '批量导入',
-          roles: ['人事处主管', '系部主管'] // or you can only set roles in subTable nav
-        }
-      },
-      {
-        path: 'documentdownload',
-        component: () => import('@/views/alphaViews/smartService/documentDownload'),
-        name: 'documentdownload',
-        meta: {
-          title: '文件下载',
-          roles: ['教师', '系部主管'] // or you can only set roles in subTable nav
-        }
-      },
+      // {
+      //   path: 'batchimport',
+      //   component: () => import('@/views/alphaViews/smartService/batchImport'),
+      //   name: 'batchimport',
+      //   meta: {
+      //     title: '批量导入',
+      //     roles: ['人事处主管', '系部主管'] // or you can only set roles in subTable nav
+      //   }
+      // },
+      // {
+      //   path: 'documentdownload',
+      //   component: () => import('@/views/alphaViews/smartService/documentDownload'),
+      //   name: 'documentdownload',
+      //   meta: {
+      //     title: '文件下载',
+      //     roles: ['教师', '系部主管'] // or you can only set roles in subTable nav
+      //   }
+      // },
       {
         path: 'smartimport',
         component: () => import('@/views/alphaViews/smartService/fileLibrary'),
         name: 'smartimport',
         meta: {
           title: '文件库',
-          roles: ['人事处主管', '系部主管'] // or you can only set roles in subTable nav
+          roles: ['人事处主管'] // or you can only set roles in subTable nav
         }
+      },
+      {
+        path: 'smartimportfortwo',
+        component: () => import('@/views/alphaViews/smartService/fileLibraryForTwo'),
+        name: 'smartimportfortwo',
+        meta: {
+          title: '文件库',
+          roles: ['系部主管','教师'] // or you can only set roles in subTable nav
+        }
+      }
+    ]
+  },
+  // {
+  //   path: '/papertest',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/alphaViews/apapertest/index'),
+  //       name: 'papertest',
+  //       meta: { title: '论文测试', roles: ['教师','系部主管', '人事处主管'], icon: 'search', noCache: true }
+  //     }
+  //   ]
+  // },
+  {
+    path: '/diagnosistask',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/alphaViews/diagnosisTask/index'),
+        name: 'diagnosistask',
+        meta: { title: '诊改任务', roles: ['教师'], icon: 'star', noCache: true }
       }
     ]
   },

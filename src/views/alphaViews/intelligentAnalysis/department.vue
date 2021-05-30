@@ -518,8 +518,8 @@
         },
         getScore: function () {
           const prams = {
-            tecUsername: 'rmyzAdmin',
-            // tecUsername: localStorage.getItem('jwt')
+            // tecUsername: 'rmyzAdmin',
+            tecUsername: localStorage.getItem('jwt'),
             authority: '系部主管'
           }
           getTeacherEvaluationScore(prams).then(response => {

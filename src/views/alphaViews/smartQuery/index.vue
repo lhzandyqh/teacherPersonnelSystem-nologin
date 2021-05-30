@@ -12,7 +12,7 @@
         </el-select>
 <!--        <span style="font-size: 1rem;font-weight: bolder;margin-left: 3vw;margin-right: 15px">请输入关键词(选填):</span>-->
 <!--        <el-input  v-model="input" placeholder="教师姓名/学院/部门" style="width: 18vw"></el-input>-->
-        <el-button type="primary" round plain style="margin-left: 3vw" icon="el-icon-search" @click="searchmsg">点击查询</el-button>
+        <el-button type="primary" round plain style="margin-left: 3vw" icon="el-icon-search" @click="beginFindOneTeacher">点击查询</el-button>
       </el-row>
       <!--        <el-row  ">-->
       <div class="teacher_option_container">
@@ -200,54 +200,6 @@
           </el-row>
         </div>
       </div>
-<!--      <div style="margin-top: 3vh;overflow: hidden;width: 100%">-->
-<!--        <span style="font-size: 1rem;font-weight: bolder;float:left;margin-left: 3vh">设置筛选条件:</span>-->
-<!--        <span style="font-size: 0.95rem;font-weight: bolder;float:left;margin-left:15px;margin-right: 10px">学院</span>-->
-<!--        <el-checkbox v-model="checked1" style="float:left;margin-right: 3vh">不限</el-checkbox>-->
-<!--        <el-checkbox-group v-model="college" style="width: 70%;float:left">-->
-<!--          <el-checkbox v-for="(item,index) in collegeList"-->
-<!--                       :key="index"-->
-<!--                       :label="item.label"-->
-<!--                       @change="change1"-->
-<!--          ></el-checkbox>-->
-<!--        </el-checkbox-group>-->
-<!--      </div>-->
-<!--      &lt;!&ndash;        </el-row>&ndash;&gt;-->
-<!--      &lt;!&ndash;        <HR width=1100 color=#dcdfe6 SIZE=1 align="right" />&ndash;&gt;-->
-<!--      <el-row  style="margin-top: 3vh">-->
-<!--        <span style="font-size: 0.95rem;font-weight: bolder;float:left;margin-right: 10px;margin-left: 135.5px">部门</span>-->
-<!--        <el-checkbox v-model="checked2" style="float:left;margin-right: 3vh">不限</el-checkbox>-->
-<!--        <el-checkbox-group v-model="department" style="width: 70%;float:left">-->
-<!--          <el-checkbox v-for="(item,index) in departmentList"-->
-<!--                       :key="index"-->
-<!--                       :label="item.label"-->
-<!--                       @change="change2"-->
-<!--          ></el-checkbox>-->
-<!--        </el-checkbox-group>-->
-<!--      </el-row>-->
-<!--      <el-row  style="margin-top: 3vh">-->
-<!--        <span style="font-size: 0.95rem;font-weight: bolder;float:left;margin-right: 10px;margin-left: 135.5px">工资</span>-->
-<!--        <el-checkbox v-model="checked5" style="float:left;margin-right: 3vh">不限</el-checkbox>-->
-<!--        <el-checkbox-group v-model="money" style="width: 70%;float:left">-->
-<!--          <el-checkbox v-for="(item,index) in moneyList"-->
-<!--                       :key="index"-->
-<!--                       :label="item.label"-->
-<!--                       @change="change5"-->
-<!--          ></el-checkbox>-->
-<!--        </el-checkbox-group>-->
-<!--      </el-row>-->
-<!--      <el-row  style="margin-top: 3vh">-->
-<!--        <span style="font-size: 0.95rem;font-weight: bolder;float:left;margin-right: 10px;margin-left: 135.5px">职称</span>-->
-<!--        <el-checkbox v-model="checked3" style="float:left;margin-right: 3vh">不限</el-checkbox>-->
-<!--        <el-checkbox-group v-model="zhicheng" style="width: 70%;float:left">-->
-<!--          <el-checkbox v-for="(item,index) in classList"-->
-<!--                       :key="index"-->
-<!--                       :label="item.label"-->
-<!--                       @change="change3"-->
-<!--          ></el-checkbox>-->
-<!--        </el-checkbox-group>-->
-<!--        <span style="float: right;font-size: 0.95rem;font-weight: bolder;">100+个老师符合条件</span>-->
-<!--      </el-row>-->
       <el-divider></el-divider>
       <div v-if="viewimg" class="img">
         <img src="../../../assets/zanwu.png">
@@ -259,53 +211,52 @@
         <el-table
           v-if="viewtable"
           ref="multipleTable"
-          :data="tableData"
+          :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
           tooltip-effect="dark"
-          style="width: 100%;margin-top: 20px"
-          @selection-change="handleSelectionChange">
-          <el-table-column
-            v-if="piliangFlag"
-            type="selection"
-            width="55"/>
+          style="width: 100%;margin-top: 20px">
           <!--      <el-table-column-->
           <!--        label="编号">-->
           <!--        <template slot-scope="scope">{{ scope.row.id }}</template>-->
           <!--      </el-table-column>-->
           <el-table-column
-            prop="name"
+            prop="teaName"
             label="教师姓名"
             />
           <el-table-column
-            prop="department"
-            label="学院"
-            />
+            prop="teaSex"
+            label="性别"/>
           <el-table-column
-            prop="class"
+            prop="teaUsername"
+            label="年龄"/>
+          <el-table-column
+            prop="teaUsername"
+            label="工号"/>
+          <el-table-column
+            prop="dept"
             label="部门"
           />
           <el-table-column
-            prop="zhicheng"
-            label="职称"/>
+            prop="workStatus"
+            label="工作状态"/>
           <el-table-column
-            prop="bdate"
+            prop="hireType"
+            label="人员类别"/>
+          <el-table-column
+            prop="workStartDate"
             label="入职时间"/>
           <el-table-column
-            prop="money"
-            label="工资"/>
+            prop="leaveSchoolDate"
+            label="离职时间"/>
           <el-table-column
-            prop="work"
-            label="工作状态"
-          />
-          <el-table-column
-            prop="tel"
+            prop="phoneNum"
             label="联系方式"
           />
         </el-table>
         <div style="text-align: center">
           <el-pagination
             :current-page="currentPage"
-            :page-sizes="[10, 20, 30]"
-            :page-size="10"
+            :page-sizes="[5, 10, 15]"
+            :page-size="pageSize"
             :total="tableData.length"
             style="margin-top:20px;"
             layout="total, sizes, prev, pager, next, jumper"
@@ -320,10 +271,13 @@
 
 <script>
 import { perGetAllOrg } from '@/api/authorityManagement'
+import { teacherInformationQuery } from '@/api/intelligentSearch'
 export default {
   name: 'Index',
   data(){
     return{
+      currentPage: 1,
+      pageSize: 5,
       options: [],
       defaultProps: {
         children: 'children',
@@ -331,7 +285,7 @@ export default {
         value: 'orgName'
       },
       queryForm: {
-        dept: '',
+        dept: [],
         gender: '',
         political: '',
         positionTime: '',
@@ -348,88 +302,7 @@ export default {
         ifDouble: '',
         ifMajorHead: ''
       },
-      tableData: [
-        {
-         name:'王宁',
-          department:'临床医学系',
-          class:'教务处',
-          zhicheng:'教授',
-          bdate: '2015-7-5',
-          money:'7000',
-          work:'在岗',
-          tel:'13956432xxxx'
-        },
-        {
-          name:'李强',
-          department:'中医与药学系',
-          class:'档案中心',
-          zhicheng:'讲师',
-          bdate: '2012-7-5',
-          money:'5000',
-          work:'在岗',
-          tel:'13956432xxxx'
-        },
-        {
-          name:'成佳宁',
-          department:'口腔医学系',
-          class:'校党委',
-          zhicheng:'教授',
-          bdate: '2010-7-5',
-          money:'9000',
-          work:'在岗',
-          tel:'14556432xxxx'
-        },
-        {
-          name:'刘明',
-          department:'护理系',
-          class:'教务处',
-          zhicheng:'副教授',
-          bdate: '2013-7-5',
-          money:'6000',
-          work:'在岗',
-          tel:'13956432xxxx'
-        },
-        {
-          name:'王侯',
-          department:'口腔医学系',
-          class:'教务处',
-          zhicheng:'副教授',
-          bdate: '2014-7-5',
-          money:'7000',
-          work:'在岗',
-          tel:'13956112xxxx'
-        },
-        {
-          name:'张铁林',
-          department:'临床医学系',
-          class:'审计处',
-          zhicheng:'助教',
-          bdate: '2017-7-5',
-          money:'4000',
-          work:'在岗',
-          tel:'13888432xxxx'
-        },
-        {
-          name:'王正',
-          department:'中医与药学系',
-          class:'教务处',
-          zhicheng:'副教授',
-          bdate: '2014-7-5',
-          money:'7000',
-          work:'在岗',
-          tel:'13956112xxxx'
-        },
-        {
-          name:'张强',
-          department:'中医与药学系',
-          class:'档案中心',
-          zhicheng:'助教',
-          bdate: '2018-7-5',
-          money:'4000',
-          work:'在岗',
-          tel:'13866632xxxx'
-        },
-      ],
+      tableData: [],
       viewtable:false,
       viewimg:true,
       college:[],
@@ -495,12 +368,20 @@ export default {
       ],
       options4: [
         {
-          value: '男',
-          label: '男'
+          value: '在编',
+          label: '在编'
         },
         {
-          value: '女',
-          label: '女'
+          value: '返聘',
+          label: '返聘'
+        },
+        {
+          value: '编外聘用',
+          label: '编外聘用'
+        },
+        {
+          value: '劳务派遣',
+          label: '劳务派遣'
         }
       ],
       options5: [
@@ -640,6 +521,43 @@ export default {
     this.getAllOrg()
   },
   methods: {
+    beginFindOneTeacher: function (){
+      const prams = {
+        sex: this.queryForm.gender,
+        dept: this.queryForm.dept[this.queryForm.dept.length-1],
+        politicStatus: this.queryForm.political,
+        comeToSchoolDate: this.queryForm.positionTime,
+        hireType: this.queryForm.hireType,
+        workStatus: this.queryForm.workStatus,
+        annualAssessment: this.queryForm.yearExam,
+        teaQualifiedDate: this.queryForm.jiaoziTime,
+        leaveSchoolDate: this.queryForm.departureTime,
+        initialEducation: this.queryForm.firstXue,
+        highestEducation: this.queryForm.highestXue,
+        highestDegree: this.queryForm.xuewei,
+        ifCadreTeacher: this.queryForm.ifBackBone,
+        ifDoubleTeacher: this.queryForm.ifDouble,
+        majorSubjectLeader: this.queryForm.ifMajorHead
+      }
+      teacherInformationQuery(prams).then(response => {
+        console.log('开始测试智能查询接口')
+        console.log(response.data)
+        if(response.data.data.length === 0){
+          this.$message({
+            message: '未查询到满足以上条件的教师',
+            type: 'warning'
+          })
+        }else {
+          this.$message({
+            type:'success',
+            message:'查询成功'
+          })
+          this.tableData = response.data.data
+          this.viewimg = false
+          this.viewtable = true
+        }
+      })
+    },
     handleChange(value) {
       console.log(value);
       this.condition = value
@@ -674,7 +592,13 @@ export default {
     change5(){
       this.checked5 = false
     },
-
+    handleSizeChange(val) {
+      this.currentPage = 1
+      this.pageSize = val
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+    }
   }
 }
 </script>

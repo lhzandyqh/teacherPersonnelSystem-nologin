@@ -5,7 +5,7 @@
         <el-row :gutter="5">
           <el-col :span="3">
             <div class="shenpiselect">
-              <span style="font-size: 16px;font-weight: bolder">选人事处择审批类型：</span>
+              <span style="font-size: 16px;font-weight: bolder">选择审批类型：</span>
             </div>
           </el-col>
           <el-col :span="6">

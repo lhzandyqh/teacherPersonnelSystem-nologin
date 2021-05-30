@@ -730,7 +730,6 @@ export default {
   name: 'PeopleApproval',
   data() {
     return {
-      currentPage: 1, // 当前页码
       pageSize: 10, // 每页的数据条数,
       xueliVisible: false,
       radio: '1',

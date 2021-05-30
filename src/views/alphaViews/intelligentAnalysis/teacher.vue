@@ -14,7 +14,7 @@
                 <span>师德考核得分</span>
               </div>
               <div class="sco_two_layer">
-                <span>96.5(第12名)</span>
+                <span>{{AllScore.ethicsAssessmentScore}}(第{{AllScore.ethicsAssessmentScoreRank}}名)</span>
               </div>
             </div>
           </div>
@@ -27,7 +27,7 @@
                 <span>年度考核得分</span>
               </div>
               <div class="sco_two_layer">
-                <span>96.5(第12名)</span>
+                <span>{{AllScore.annualAssessmentScore}}(第{{AllScore.annualAssessmentScoreRank}}名)</span>
               </div>
             </div>
           </div>
@@ -40,7 +40,7 @@
                 <span>督导考核得分</span>
               </div>
               <div class="sco_two_layer">
-                <span>96.5(第12名)</span>
+                <span>{{AllScore.supervisionAssessmentScore}}(第{{AllScore.supervisionAssessmentScoreRank}}名)</span>
               </div>
             </div>
           </div>
@@ -53,7 +53,7 @@
                 <span>学生考核得分</span>
               </div>
               <div class="sco_two_layer">
-                <span>96.5(第12名)</span>
+                <span>{{AllScore.studentAssessmentScore}}(第{{AllScore.studentAssessmentScoreRank}}名)</span>
               </div>
             </div>
           </div>
@@ -82,7 +82,9 @@
 
 <script>
   import echarts from 'echarts'
+  import { getTeacherEvaluationScore } from '@/api/allChangeAnalysis'
   import { geTeacherWorkStatistic } from '@/api/allChangeAnalysis'
+  import { getTeacherAbilityRadarData } from '@/api/allChangeAnalysis'
   require('echarts/theme/macarons') // echarts theme
     export default {
       name: "teacher",
@@ -278,18 +280,32 @@
                 ]
               }
             ]
-          }
+          },
+          AllScore: {}
         }
       },
       mounted() {
+        this.getScore()
         this.getEchartData()
-        this.initChart()
         // this.initChartTwo()
         setTimeout(()=>{
           this.initChartTwo()
+          this.initChart()
         },500)
       },
       methods: {
+        getScore: function () {
+          const prams = {
+            // tecUsername: 'rmyzAdmin',
+            tecUsername: localStorage.getItem('jwt'),
+            authority: '教师'
+          }
+          getTeacherEvaluationScore(prams).then(response => {
+            console.log('教师获取考核得分')
+            console.log(response.data)
+            this.AllScore = response.data.data
+          })
+        },
         getEchartData: function() {
           const prams = {
             // tecUsername: 'rmyzAdmin',
@@ -332,6 +348,26 @@
           window.addEventListener("resize",function (){
             this.chart.resize;
           });
+        },
+        getEchartDataLeida: function () {
+          const prams = {
+            // tecUsername: 'rmyzAdmin',
+            tecUsername: localStorage.getItem('jwt'),
+            authority: '教师'
+          }
+          getTeacherAbilityRadarData(prams).then(resposne => {
+            console.log('教师测试获取雷达图数据')
+            console.log(resposne.data)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.teachAndMajorDevStandardNums)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.stuManageWorkStandardNums)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.sciAndSocialServiceSandardNums)
+            this.option.series[0].data[0].value.push(resposne.data.data.standardValue.personnelDevStandardNums)
+            // console.log(resposne.data.data.currentValue)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.teachAndMajorDevTotalNums)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.stuManageWorkTotalNums)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.sciAndSocialServiceTotalNums)
+            this.option.series[0].data[1].value.push(resposne.data.data.currentValue.personnelDevTotalNums)
+          })
         }
       }
     }

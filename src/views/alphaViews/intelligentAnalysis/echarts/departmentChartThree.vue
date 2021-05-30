@@ -71,8 +71,8 @@
       methods: {
         getChartData: function() {
           const prams = {
-            tecUsername: 'rmyzAdmin',
-            // tecUsername: localStorage.getItem('jwt')
+            // tecUsername: 'rmyzAdmin',
+            tecUsername: localStorage.getItem('jwt'),
             authority: '系部主管'
           }
           getTeacherStudentEchartsData(prams).then(response => {

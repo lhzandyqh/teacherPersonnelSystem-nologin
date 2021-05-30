@@ -69,8 +69,8 @@ export default {
     },
     getAll: function () {
       const prams = {
-        username: '10003'
-        // username:localStorage.getItem('jwt')
+        // username: '10003'
+        username:localStorage.getItem('jwt')
       }
       getAllPermissions(prams).then(response => {
         console.log('测试所有的权限')
